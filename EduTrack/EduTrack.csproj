@@ -1,0 +1,540 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.Windows.SDK.Contracts.10.0.18362.2005\build\Microsoft.Windows.SDK.Contracts.props" Condition="Exists('..\packages\Microsoft.Windows.SDK.Contracts.10.0.18362.2005\build\Microsoft.Windows.SDK.Contracts.props')" />
+  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
+  <Import Project="..\packages\SQLite.3.13.0\build\net45\SQLite.props" Condition="Exists('..\packages\SQLite.3.13.0\build\net45\SQLite.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2D0A28F7-8144-4473-99C0-C41448EA8EE3}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>EduTrack</RootNamespace>
+    <AssemblyName>EduTrack</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>1.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>EduTrack.App</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Bogus">
+      <Version>35.5.1</Version>
+    </PackageReference>
+    <PackageReference Include="EntityFramework" Version="6.4.4" />
+    <PackageReference Include="MahApps.Metro">
+      <Version>2.4.10</Version>
+    </PackageReference>
+    <PackageReference Include="MediaElementPro">
+      <Version>1.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="MySql.Data">
+      <Version>8.3.0</Version>
+    </PackageReference>
+    <Reference Include="netstandard" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Models\EmployeeOrTeacher.cs" />
+    <Compile Include="Models\Student.cs" />
+    <Compile Include="Models\Teacher.cs" />
+    <Compile Include="Models\Employee.cs" />
+    <Compile Include="SignUpPage.xaml.cs">
+      <DependentUpon>SignUpPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Utilities\Btn.cs" />
+    <Compile Include="Utilities\RelayCommand.cs" />
+    <Compile Include="Utilities\ViewModelBase.cs" />
+    <Compile Include="ViewModel\BackupVM.cs" />
+    <Compile Include="ViewModel\ClassVM.cs" />
+    <Compile Include="ViewModel\MembersVM.cs" />
+    <Compile Include="ViewModel\NewClassVM.cs" />
+    <Compile Include="ViewModel\NewEmployeeVM.cs" />
+    <Compile Include="ViewModel\NewStudentVM.cs" />
+    <Compile Include="ViewModel\NewTeachersVM.cs" />
+    <Compile Include="ViewModel\SettingsVM.cs" />
+    <Compile Include="ViewModel\ShowClassesVM.cs" />
+    <Compile Include="ViewModel\ShowEmployeesVM.cs" />
+    <Compile Include="ViewModel\ShowStudentsVM.cs" />
+    <Compile Include="ViewModel\ShowTeachersVM.cs" />
+    <Compile Include="ViewModel\StudentsVM.cs" />
+    <Compile Include="ViewModel\HomeVM.cs" />
+    <Compile Include="ViewModel\NavigationVM.cs" />
+    <Compile Include="ViewModel\TeachersVM.cs" />
+    <Compile Include="ViewModel\AboutVM.cs" />
+    <Compile Include="View\Backup.xaml.cs">
+      <DependentUpon>Backup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Class.xaml.cs">
+      <DependentUpon>Class.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\DetailedEmployeeInfoView.xaml.cs">
+      <DependentUpon>DetailedEmployeeInfoView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\DetailedStudentInfoView.xaml.cs">
+      <DependentUpon>DetailedStudentInfoView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\DetailedTeacherInfoView.xaml.cs">
+      <DependentUpon>DetailedTeacherInfoView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\DocumentViewerWindow.xaml.cs">
+      <DependentUpon>DocumentViewerWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\GeneralSettings.xaml.cs">
+      <DependentUpon>GeneralSettings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Members.xaml.cs">
+      <DependentUpon>Members.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\NewClass.xaml.cs">
+      <DependentUpon>NewClass.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\NewEmployee.xaml.cs">
+      <DependentUpon>NewEmployee.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\NewStudent.xaml.cs">
+      <DependentUpon>NewStudent.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\NewTeacher.xaml.cs">
+      <DependentUpon>NewTeacher.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Settings.xaml.cs">
+      <DependentUpon>Settings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ShowClasses.xaml.cs">
+      <DependentUpon>ShowClasses.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ShowEmployees.xaml.cs">
+      <DependentUpon>ShowEmployees.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ShowStudents.xaml.cs">
+      <DependentUpon>ShowStudents.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ShowTeachers.xaml.cs">
+      <DependentUpon>ShowTeachers.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Students.xaml.cs">
+      <DependentUpon>Students.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Home.xaml.cs">
+      <DependentUpon>Home.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Teachers.xaml.cs">
+      <DependentUpon>Teachers.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\About.xaml.cs">
+      <DependentUpon>About.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Data\CountryList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Data\GenderList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ScreenLoading.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ScreenLoading.xaml.cs">
+      <DependentUpon>ScreenLoading.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="NextWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SignUpPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\Button.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\Button_Style.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\Image.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\Page.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\ScrollBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\Text.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\TextBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Utilities\DataTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Backup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Class.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\DetailedEmployeeInfoView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\DetailedStudentInfoView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\DetailedTeacherInfoView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\DocumentViewerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\GeneralSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Members.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\NewClass.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\NewEmployee.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\NewStudent.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\NewTeacher.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Settings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ShowClasses.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ShowEmployees.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ShowStudents.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ShowTeachers.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Students.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Home.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Teachers.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="NextWindow.xaml.cs">
+      <DependentUpon>NextWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.8">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.8 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\LoadingScreen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="1.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\MainIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\Icons\user.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\Icons\padlock.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\img_customer.png" />
+    <Resource Include="Image\img_home.png" />
+    <Resource Include="Image\img_order.png" />
+    <Resource Include="Image\img_setting.png" />
+    <Resource Include="Image\img_transaction.png" />
+    <Resource Include="Image\Icons\shutdown_def.png" />
+    <Resource Include="Image\Icons\shutdown_mo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\Logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\Students-info.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\Icons\class-icon.png" />
+    <Resource Include="Image\Icons\grades-icon.png" />
+    <Resource Include="Image\Icons\schedule-icon.png" />
+    <Resource Include="Image\Icons\teacher-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\member-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Images\NewStudent.png" />
+    <Resource Include="View\Images\StudentsList.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Images\Student_background.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\ProfileIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\Home_Page.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Images\NewMember.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Images\ListMembers.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Images\AudioSettings.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Images\GeneralSettings.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Images\NewTeacher.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Images\ShowTeachers.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Images\NewClass.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Images\ShowClasses.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Images\StudentImage.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Images\TeacherImage.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Images\ClassImage.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Images\SettingsBackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Images\Transaction.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\2.png" />
+    <Resource Include="Image\3.png" />
+    <Resource Include="Image\4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Images\View-Icon.png" />
+    <Resource Include="View\Images\EmployeeImage.png" />
+    <Resource Include="Image\Logo4.png" />
+    <Resource Include="Image\MainLogo2.png" />
+    <Resource Include="Image\MainIcon2.png" />
+    <Resource Include="Image\Buttons\Left-Arrow.png" />
+    <Resource Include="Image\Buttons\Right-Arrow.png" />
+    <Resource Include="Image\Icons\user-blue.png" />
+    <Resource Include="Image\Icons\minimize-red.png" />
+    <Resource Include="Image\Icons\minimize-white.png" />
+    <Resource Include="Image\Icons\maximize-red.png" />
+    <Resource Include="Image\Icons\maximize-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\Icons\Refresh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\Icons\Refresh-Blue.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\Icons\About.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\Icons\icon-github.png" />
+    <Resource Include="Image\Icons\icon-linkedin.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\QR-code.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\Icons\icon-paypal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\Icons\dark-mode.png" />
+    <Resource Include="Image\Icons\light-mode.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\SQLite.3.13.0\build\net45\SQLite.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SQLite.3.13.0\build\net45\SQLite.props'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
+    <Error Condition="!Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets'))" />
+    <Error Condition="!Exists('..\packages\System.Runtime.WindowsRuntime.4.6.0\build\net461\System.Runtime.WindowsRuntime.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Runtime.WindowsRuntime.4.6.0\build\net461\System.Runtime.WindowsRuntime.targets'))" />
+    <Error Condition="!Exists('..\packages\System.Runtime.WindowsRuntime.UI.Xaml.4.6.0\build\net461\System.Runtime.WindowsRuntime.UI.Xaml.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Runtime.WindowsRuntime.UI.Xaml.4.6.0\build\net461\System.Runtime.WindowsRuntime.UI.Xaml.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Windows.SDK.Contracts.10.0.18362.2005\build\Microsoft.Windows.SDK.Contracts.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.SDK.Contracts.10.0.18362.2005\build\Microsoft.Windows.SDK.Contracts.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Windows.SDK.Contracts.10.0.18362.2005\build\Microsoft.Windows.SDK.Contracts.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.SDK.Contracts.10.0.18362.2005\build\Microsoft.Windows.SDK.Contracts.targets'))" />
+  </Target>
+  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
+  <Import Project="..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets" Condition="Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" />
+  <Import Project="..\packages\System.Runtime.WindowsRuntime.4.6.0\build\net461\System.Runtime.WindowsRuntime.targets" Condition="Exists('..\packages\System.Runtime.WindowsRuntime.4.6.0\build\net461\System.Runtime.WindowsRuntime.targets')" />
+  <Import Project="..\packages\System.Runtime.WindowsRuntime.UI.Xaml.4.6.0\build\net461\System.Runtime.WindowsRuntime.UI.Xaml.targets" Condition="Exists('..\packages\System.Runtime.WindowsRuntime.UI.Xaml.4.6.0\build\net461\System.Runtime.WindowsRuntime.UI.Xaml.targets')" />
+  <Import Project="..\packages\Microsoft.Windows.SDK.Contracts.10.0.18362.2005\build\Microsoft.Windows.SDK.Contracts.targets" Condition="Exists('..\packages\Microsoft.Windows.SDK.Contracts.10.0.18362.2005\build\Microsoft.Windows.SDK.Contracts.targets')" />
+</Project>

@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="EduTrack.View.Teachers"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:EduTrack.ViewModel"
+             xmlns:Menu="clr-namespace:EduTrack.Utilities"
+             xmlns:local="clr-namespace:EduTrack.View"
+             mc:Ignorable="d" Width="1397" Height="677">
+    <Grid>
+        <!--// Window Border //-->
+        <Border Background="#212529"
+                CornerRadius="20" HorizontalAlignment="Center" Width="1397" />
+        <Image Source="Images/TeacherImage.png" Margin="226,-19,1,0"/>
+        <Grid>
+            <!--// Base Grid //-->
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="228" />
+                <ColumnDefinition Width="622" />
+            </Grid.ColumnDefinitions>
+            <!--// Navigation Panel //-->
+            <Grid HorizontalAlignment="Left"
+                  Width="228">
+                <Border Background="#272B2F"
+                        CornerRadius="20,20,20,20"
+                        BorderThickness="2" BorderBrush="#10CCFC"/>
+                <StackPanel Height="400"
+                            Width="228">
+                    <!--// Customer //-->
+                    <Menu:Btn Style="{StaticResource BtnStyle}"
+                              Command="{Binding NewTeacherCommand}" Width="211" Checked="Btn_Checked">
+                        <Grid>
+                            <Image Source="Images/NewTeacher.png"
+                                   Style="{StaticResource Image_Style}" />
+                            <TextBlock Text="New Teacher"
+                                       Style="{StaticResource Text_Style}" />
+                        </Grid>
+                    </Menu:Btn>
+                    <!--// Products //-->
+                    <Menu:Btn Style="{StaticResource BtnStyle}"
+                              Command="{Binding ShowTeachersCommand}" Width="211" Checked="Btn_Checked_1">
+                        <Grid>
+                            <Image Source="Images/ShowTeachers.png"
+                                   Style="{StaticResource Image_Style}" />
+                            <TextBlock Text="Show Teachers"
+                                       Style="{StaticResource Text_Style}" />
+                        </Grid>
+                    </Menu:Btn>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Column="1" Margin="0,0,-547,0">
+                <ContentControl x:Name="Pages"
+                                Content="{Binding CurrentView}" />
+            </Grid>
+            <Label Content="Teachers:" FontSize="35" Foreground="White" Margin="24,35,31,584" />
+        </Grid>
+    </Grid>
+</UserControl>

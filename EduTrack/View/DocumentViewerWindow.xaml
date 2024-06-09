@@ -1,0 +1,10 @@
+﻿<Window x:Class="EduTrack.View.DocumentViewerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Document Viewer" Height="574" Width="999" Background="Black" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <Image x:Name="documentImage" Stretch="Uniform" />
+        </ScrollViewer>
+    </Grid>
+</Window>

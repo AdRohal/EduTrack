@@ -1,0 +1,202 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:System="clr-namespace:System;assembly=mscorlib">
+    <!-- Changed to use System:String for string type -->
+    <x:Array x:Key="CountryList" Type="{x:Type System:String}">
+        <System:String>Afghanistan</System:String>
+        <System:String>Albania</System:String>
+        <System:String>Algeria</System:String>
+        <System:String>Andorra</System:String>
+                <System:String>Angola</System:String>
+                <System:String>Antigua and Barbuda</System:String>
+                <System:String>Argentina</System:String>
+                <System:String>Armenia</System:String>
+                <System:String>Australia</System:String>
+                <System:String>Austria</System:String>
+                <System:String>Azerbaijan</System:String>
+                <System:String>Bahamas</System:String>
+                <System:String>Bahrain</System:String>
+                <System:String>Bangladesh</System:String>
+                <System:String>Barbados</System:String>
+                <System:String>Belarus</System:String>
+                <System:String>Belgium</System:String>
+                <System:String>Belize</System:String>
+                <System:String>Benin</System:String>
+                <System:String>Bhutan</System:String>
+                <System:String>Bolivia</System:String>
+                <System:String>Bosnia and Herzegovina</System:String>
+                <System:String>Botswana</System:String>
+                <System:String>Brazil</System:String>
+                <System:String>Brunei</System:String>
+                <System:String>Bulgaria</System:String>
+                <System:String>Burkina Faso</System:String>
+                <System:String>Burundi</System:String>
+                <System:String>Cabo Verde</System:String>
+                <System:String>Cambodia</System:String>
+                <System:String>Cameroon</System:String>
+                <System:String>Canada</System:String>
+                <System:String>Central African Republic</System:String>
+                <System:String>Chad</System:String>
+                <System:String>Chile</System:String>
+                <System:String>China</System:String>
+                <System:String>Colombia</System:String>
+                <System:String>Comoros</System:String>
+                <System:String>Congo (Congo-Brazzaville)</System:String>
+                <System:String>Costa Rica</System:String>
+                <System:String>Croatia</System:String>
+                <System:String>Cuba</System:String>
+                <System:String>Cyprus</System:String>
+                <System:String>Czechia (Czech Republic)</System:String>
+                <System:String>Denmark</System:String>
+                <System:String>Djibouti</System:String>
+                <System:String>Dominica</System:String>
+                <System:String>Dominican Republic</System:String>
+                <System:String>Ecuador</System:String>
+                <System:String>Egypt</System:String>
+                <System:String>El Salvador</System:String>
+                <System:String>Equatorial Guinea</System:String>
+                <System:String>Eritrea</System:String>
+                <System:String>Estonia</System:String>
+                <System:String>Eswatini (fmr. "Swaziland")</System:String>
+                <System:String>Ethiopia</System:String>
+                <System:String>Fiji</System:String>
+                <System:String>Finland</System:String>
+                <System:String>France</System:String>
+                <System:String>Gabon</System:String>
+                <System:String>Gambia</System:String>
+                <System:String>Georgia</System:String>
+                <System:String>Germany</System:String>
+                <System:String>Ghana</System:String>
+                <System:String>Greece</System:String>
+                <System:String>Grenada</System:String>
+                <System:String>Guatemala</System:String>
+                <System:String>Guinea</System:String>
+                <System:String>Guinea-Bissau</System:String>
+                <System:String>Guyana</System:String>
+                <System:String>Haiti</System:String>
+                <System:String>Holy See</System:String>
+                <System:String>Honduras</System:String>
+                <System:String>Hungary</System:String>
+                <System:String>Iceland</System:String>
+                <System:String>India</System:String>
+                <System:String>Indonesia</System:String>
+                <System:String>Iran</System:String>
+                <System:String>Iraq</System:String>
+                <System:String>Ireland</System:String>
+                <System:String>Israel</System:String>
+                <System:String>Italy</System:String>
+                <System:String>Jamaica</System:String>
+                <System:String>Japan</System:String>
+                <System:String>Jordan</System:String>
+                <System:String>Kazakhstan</System:String>
+                <System:String>Kenya</System:String>
+                <System:String>Kiribati</System:String>
+                <System:String>Korea, North</System:String>
+                <System:String>Korea, South</System:String>
+                <System:String>Kosovo</System:String>
+                <System:String>Kuwait</System:String>
+                <System:String>Kyrgyzstan</System:String>
+                <System:String>Laos</System:String>
+                <System:String>Latvia</System:String>
+                <System:String>Lebanon</System:String>
+                <System:String>Lesotho</System:String>
+                <System:String>Liberia</System:String>
+                <System:String>Libya</System:String>
+                <System:String>Liechtenstein</System:String>
+                <System:String>Lithuania</System:String>
+                <System:String>Luxembourg</System:String>
+                <System:String>Madagascar</System:String>
+                <System:String>Malawi</System:String>
+                <System:String>Malaysia</System:String>
+                <System:String>Maldives</System:String>
+                <System:String>Mali</System:String>
+                <System:String>Malta</System:String>
+                <System:String>Marshall Islands</System:String>
+                <System:String>Mauritania</System:String>
+                <System:String>Mauritius</System:String>
+                <System:String>Mexico</System:String>
+                <System:String>Micronesia</System:String>
+                <System:String>Moldova</System:String>
+                <System:String>Monaco</System:String>
+                <System:String>Mongolia</System:String>
+                <System:String>Montenegro</System:String>
+                <System:String>Morocco</System:String>
+                <System:String>Mozambique</System:String>
+                <System:String>Myanmar (formerly Burma)</System:String>
+                <System:String>Namibia</System:String>
+                <System:String>Nauru</System:String>
+                <System:String>Nepal</System:String>
+                <System:String>Netherlands</System:String>
+                <System:String>New Zealand</System:String>
+                <System:String>Nicaragua</System:String>
+                <System:String>Niger</System:String>
+                <System:String>Nigeria</System:String>
+                <System:String>North Macedonia</System:String>
+                <System:String>Norway</System:String>
+                <System:String>Oman</System:String>
+                <System:String>Pakistan</System:String>
+                <System:String>Palau</System:String>
+                <System:String>Palestine State</System:String>
+                <System:String>Panama</System:String>
+                <System:String>Papua New Guinea</System:String>
+                <System:String>Paraguay</System:String>
+                <System:String>Peru</System:String>
+                <System:String>Philippines</System:String>
+                <System:String>Poland</System:String>
+                <System:String>Portugal</System:String>
+                <System:String>Qatar</System:String>
+                <System:String>Romania</System:String>
+                <System:String>Russia</System:String>
+                <System:String>Rwanda</System:String>
+                <System:String>Saint Kitts and Nevis</System:String>
+                <System:String>Saint Lucia</System:String>
+                <System:String>Saint Vincent and the Grenadines</System:String>
+                <System:String>Samoa</System:String>
+                <System:String>San Marino</System:String>
+                <System:String>Sao Tome and Principe</System:String>
+                <System:String>Saudi Arabia</System:String>
+                <System:String>Senegal</System:String>
+                <System:String>Serbia</System:String>
+                <System:String>Seychelles</System:String>
+                <System:String>Sierra Leone</System:String>
+                <System:String>Singapore</System:String>
+                <System:String>Slovakia</System:String>
+                <System:String>Slovenia</System:String>
+                <System:String>Solomon Islands</System:String>
+                <System:String>Somalia</System:String>
+                <System:String>South Africa</System:String>
+                <System:String>South Sudan</System:String>
+                <System:String>Spain</System:String>
+                <System:String>Sri Lanka</System:String>
+                <System:String>Sudan</System:String>
+                <System:String>Suriname</System:String>
+                <System:String>Sweden</System:String>
+                <System:String>Switzerland</System:String>
+                <System:String>Syria</System:String>
+                <System:String>Tajikistan</System:String>
+                <System:String>Tanzania</System:String>
+                <System:String>Thailand</System:String>
+                <System:String>Timor-Leste</System:String>
+                <System:String>Togo</System:String>
+                <System:String>Tonga</System:String>
+                <System:String>Trinidad and Tobago</System:String>
+                <System:String>Tunisia</System:String>
+                <System:String>Turkey</System:String>
+                <System:String>Turkmenistan</System:String>
+                <System:String>Tuvalu</System:String>
+                <System:String>Uganda</System:String>
+                <System:String>Ukraine</System:String>
+                <System:String>United Arab Emirates</System:String>
+                <System:String>United Kingdom</System:String>
+                <System:String>United States</System:String>
+                <System:String>Uruguay</System:String>
+                <System:String>Uzbekistan</System:String>
+                <System:String>Vanuatu</System:String>
+                <System:String>Vatican City</System:String>
+                <System:String>Venezuela</System:String>
+                <System:String>Vietnam</System:String>
+                <System:String>Yemen</System:String>
+                <System:String>Zambia</System:String>
+                <System:String>Zimbabwe</System:String>
+            </x:Array>
+</ResourceDictionary>

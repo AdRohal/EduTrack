@@ -1,0 +1,198 @@
+﻿<Window x:Class="EduTrack.View.DetailedStudentInfoView"
+                                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:EduTrack.View"
+             mc:Ignorable="d" Height="668" Width="1174" Background="#212529">
+
+    <Grid Margin="0,0,0,-404">
+        <!-- Reminder message -->
+        <TextBlock x:Name="ReminderMessage" Text="Don't forget to press the 'Save' button to save your changes!" 
+           Foreground="Red" FontSize="16" FontWeight="Bold" HorizontalAlignment="Left" 
+           VerticalAlignment="Top" Opacity="0" Height="25" Margin="4,650,0,0" Width="472"/>
+        <!-- Wrap the content inside a ScrollViewer -->
+        <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="4,0,-4,447">
+            <ScrollViewer.Resources>
+                <ResourceDictionary Source="/EduTrack;component/Styles/ScrollBar.xaml" />
+            </ScrollViewer.Resources>
+            <Grid Height="1241">
+                <Button Content="Save" Click="Button_Click" Style="{StaticResource UploadPictureButtonStyle}" Height="40" Margin="931,1173,62,28"/>
+                <Button Content="Delete" Click="Button_Click2" FontSize="24" Foreground="white" Background="#444C54" Margin="773,1173,237,28" BorderThickness="1" BorderBrush="Red" >
+                    <Button.Style>
+                        <Style TargetType="{x:Type Button}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <!-- Circular area for displaying uploaded picture -->
+                <Grid Width="247" Height="246" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="53,47,0,0">
+                    <Ellipse Fill="#808BA8"/>
+                    <Image x:Name="uploadedImage" Stretch="UniformToFill">
+                        <Image.Clip>
+                            <EllipseGeometry RadiusX="123.5" RadiusY="123.5" Center="123.5,123.5"/>
+                        </Image.Clip>
+                    </Image>
+                </Grid>
+                <Button x:Name="ProfilePicture" Content="Upload the picture" Style="{StaticResource UploadPictureButtonStyle}" Click="Button_Click_1" Height="NaN" Margin="84,320,887,886"/>
+                <Label Content="Personnel Info ( Student ): " Foreground="White" FontSize="25" HorizontalAlignment="Left" VerticalAlignment="Top" Width="294" Height="53" RenderTransformOrigin="0.5,0.5" Margin="325,4,0,0"/>
+                <!-- First Name -->
+                <TextBlock Text="First Name:" VerticalAlignment="Top" Margin="360,47,641,0" Height="32" FontSize="20" Foreground="white"/>
+                <TextBox x:Name="txtFirstName" Style="{StaticResource CustomTextBoxStyle}" FontSize="15" VerticalAlignment="Top" TextAlignment="Center" Height="34" Margin="356,82,641,0" RenderTransformOrigin="0.5,0.5"/>
+                <!-- Middle Name -->
+                <TextBox x:Name="txtMiddleName" Style="{StaticResource CustomTextBoxStyle}" TextAlignment="Center" FontSize="15" VerticalAlignment="Top" Margin="539,82,458,0" Height="34"/>
+                <TextBlock Text="Middle Name:" VerticalAlignment="Top" Margin="539,50,458,0" Height="32" FontSize="20" Foreground="white"/>
+                <!-- Last Name -->
+                <TextBlock Text="Last Name:" VerticalAlignment="Top" Height="31" Margin="726,47,295,0" RenderTransformOrigin="0.5,0.5" FontSize="20" Foreground="White"/>
+                <TextBox x:Name="txtLastName" Style="{StaticResource CustomTextBoxStyle}" TextAlignment="Center" FontSize="15" VerticalAlignment="Top" Margin="721,82,276,0" Height="34"/>
+                <!-- Gender -->
+                <TextBlock Text="Gender:" VerticalAlignment="Top" Margin="899,50,154,0" FontSize="20" Foreground="White"/>
+                <ComboBox x:Name="comboBoxGender" Background="#808BA8" VerticalAlignment="Top" Margin="895,82,62,0" Height="34" FontSize="15" Style="{StaticResource ComboBox}" ItemsSource="{StaticResource GenderList}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                <!-- E-mail -->
+                <TextBlock Text="E-mail:" VerticalAlignment="Top" Margin="356,123,697,0" FontSize="20" Foreground="White"/>
+                <TextBox x:Name="txtEmail" Style="{StaticResource CustomTextBoxStyle}" TextAlignment="Center" FontSize="15" VerticalAlignment="Top" Margin="350,157,372,0" Height="34"/>
+                <!-- Phone -->
+                <TextBlock Text="Phone:" VerticalAlignment="Top" FontSize="20" Foreground="White" Margin="804,123,237,0"/>
+                <TextBox x:Name="txtPhone" Style="{StaticResource CustomTextBoxStyle}" TextAlignment="Center"  FontSize="15" VerticalAlignment="Top" Margin="798,157,62,0" Height="34"/>
+                <!-- Birth Date -->
+                <TextBlock Text="Birth Date:" VerticalAlignment="Top" FontSize="20" Foreground="White" Height="38" Margin="356,199,675,0"/>
+                <DatePicker x:Name="datePickerBirthDate" VerticalAlignment="Top"  Margin="350,229,567,0" Height="34" FontSize="15" Foreground="Black" Background="#FF808BA8" BorderBrush="#FF808BA8"/>
+                <!-- Nationality -->
+                <TextBlock Text="Nationality:" VerticalAlignment="Top" FontSize="20" Foreground="White" Margin="608,199,414,0"/>
+                <ComboBox x:Name="comboBoxNationality" Style="{StaticResource ComboBox}" FontSize="15" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="602,229,315,0" Height="34" ItemsSource="{StaticResource CountryList}"/>
+                <!-- Dropdown for Nationality -->
+                <!-- ID Card (CIN) -->
+                <TextBlock Text="ID Card (CIN):" VerticalAlignment="Top" FontSize="20" Foreground="White" Margin="866,199,138,0"/>
+                <TextBox x:Name="txtCin" Style="{StaticResource CustomTextBoxStyle}" FontSize="15" TextAlignment="Center" VerticalAlignment="Top" Margin="855,229,62,0" Height="34"/>
+                <!-- Address -->
+                <TextBlock Text="Address:" VerticalAlignment="Top" Height="38" Margin="356,270,694,0" FontSize="20" Foreground="White"/>
+                <TextBox x:Name="txtAddress" Style="{StaticResource CustomTextBoxStyle}" TextAlignment="Center" FontSize="15" VerticalAlignment="Top" Margin="350,303,62,0" RenderTransformOrigin="0.5,0.5" Height="34"/>
+                <!-- Copy of ID Card (CIN) -->
+                <TextBlock Text="Copy of ID Card (CIN):" VerticalAlignment="Top" FontSize="20" Foreground="White" Margin="354,347,581,0" />
+                <!-- FRONT SIDE-->
+                <!-- Upload document button -->
+                <Button x:Name="UploadButton" Content="Upload Front-Side" Style="{StaticResource UploadPictureButtonStyle}" FontSize="15" Click="UploadDocument_Click" Width="166" Height="39" Margin="566,346,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                <!-- Label to display uploaded file name -->
+                <Label x:Name="FileNameLabel" Content="" Foreground="White" VerticalAlignment="Top" Margin="741,349,211,0" Height="36" FontSize="15"/>
+                <!-- View document button -->
+                <Button x:Name="ViewButton" Click="ViewDocument_Click" VerticalAlignment="Top" Margin="976,349,100,0" Height="39" FontSize="15" Visibility="Visible">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Image Source="/View\Images\View-Icon.png" Stretch="Uniform" />
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                <!-- BACK SIDE-->
+                <!-- Upload document button -->
+                <Button x:Name="UploadButton2" Content="Upload Back-Side" Style="{StaticResource UploadPictureButtonStyle}" FontSize="15" HorizontalAlignment="Left" VerticalAlignment="Top" Click="UploadDocument_Click2" Width="166" Margin="566,397,0,0"/>
+                <!-- Label to display uploaded file name -->
+                <Label x:Name="FileNameLabel2" Content="" Foreground="White" VerticalAlignment="Top" Margin="741,397,211,0" Height="36" FontSize="15"/>
+                <!-- View document button -->
+                <Button x:Name="ViewButton2" Click="ViewDocument_Click2" VerticalAlignment="Top" Margin="976,397,100,0" Height="39" FontSize="15" Visibility="Visible">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Image Source="/View\Images\View-Icon.png" Stretch="Uniform" />
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                <Label Content="Student Details : " Foreground="White" FontSize="25" HorizontalAlignment="Left" VerticalAlignment="Top" Width="246" Height="53" RenderTransformOrigin="0.5,0.5" Margin="20,427,0,0">
+                    <Label.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform AngleY="-0.218"/>
+                            <RotateTransform/>
+                            <TranslateTransform Y="-0.567"/>
+                        </TransformGroup>
+                    </Label.RenderTransform>
+                </Label>
+                <TextBlock Text="School/University :" VerticalAlignment="Top" Margin="40,475,902,0" Height="32" FontSize="20" Foreground="white"/>
+                <TextBlock Text="Joing date :" VerticalAlignment="Top" Margin="352,475,585,0" Height="32" FontSize="20" Foreground="white"/>
+                <TextBox x:Name="txtOrganization" Style="{StaticResource CustomTextBoxStyle}" TextAlignment="Center" FontSize="15" VerticalAlignment="Top" Margin="36,513,822,0" Height="34"/>
+                <DatePicker x:Name="Date_appointment" VerticalAlignment="Top" Margin="346,512,539,0" Height="34" FontSize="15" Foreground="Black" Background="#FF808BA8" BorderBrush="#FF808BA8"/>
+                <TextBlock Text="Copy of ID Card (CIN):" VerticalAlignment="Top" FontSize="20" Foreground="White" Margin="40,1060,902,0"/>
+                <TextBlock Text="Module :" VerticalAlignment="Top" Margin="638,475,401,0" Height="32" FontSize="20" Foreground="white"/>
+                <TextBox x:Name="txtModule" Style="{StaticResource CustomTextBoxStyle}" FontSize="15" VerticalAlignment="Top" TextAlignment="Center" Height="34" Margin="632,513,276,0" RenderTransformOrigin="0.5,0.5"/>
+                <TextBlock Text="Class :" VerticalAlignment="Top" Margin="901,475,173,0" Height="32" FontSize="20" Foreground="white"/>
+                <ComboBox x:Name="comboBoxClass" Background="#808BA8" VerticalAlignment="Top" Margin="895,513,62,0" Height="34" FontSize="15" Style="{StaticResource ComboBox}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                <!-- Copy of Contract -->
+                <!-- Upload document button 3 -->
+                <Button x:Name="UploadButton3"  Style="{StaticResource UploadPictureButtonStyle}" Content="Upload Front-Side" FontSize="15" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="304,1060,0,0" Click="UploadDocument_Click3" Width="166"/>
+                <!-- Label to display uploaded file name -->
+                <Label x:Name="FileNameLabel3" Content="" Foreground="White" VerticalAlignment="Top" Margin="516,1057,263,0" Height="36" FontSize="15"/>
+                <!-- View document button -->
+                <Button x:Name="ViewButton3" Click="ViewDocument_Click3" VerticalAlignment="Top" Margin="975,1060,119,0" Height="39" FontSize="15" Visibility="Visible">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Image Source="/View\Images\View-Icon.png" Stretch="Uniform" />
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                <!-- Contract-->
+                <!-- Copy of Resume -->
+                <!-- Upload document button -->
+                <Button x:Name="UploadButton4" Style="{StaticResource UploadPictureButtonStyle}" Content="Upload Back-Side" FontSize="15" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="304,1108,0,0" Click="UploadDocument_Click4" Width="166"/>
+                <!-- Label to display uploaded file name -->
+                <Label x:Name="FileNameLabel4" Content="" Foreground="White" VerticalAlignment="Top" Margin="516,1108,263,0" Height="36" FontSize="15"/>
+                <!-- View document button -->
+                <Button x:Name="ViewButton4" Click="ViewDocument_Click4" VerticalAlignment="Top" Margin="975,1108,119,0" Height="39" FontSize="15" Visibility="Visible">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Image Source="/View\Images\View-Icon.png" Stretch="Uniform" />
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                <Label Content="Education :" Foreground="White" FontSize="25" HorizontalAlignment="Left" VerticalAlignment="Top" Width="156" Height="62" RenderTransformOrigin="0.5,0.5" Margin="20,561,0,0"/>
+                <TextBlock Text="Highest Degree :" VerticalAlignment="Top" Margin="40,606,929,0" Height="32" FontSize="20" Foreground="white"/>
+                <TextBox x:Name="txtHighestDegree" Style="{StaticResource CustomTextBoxStyle}" TextAlignment="Center" FontSize="15" VerticalAlignment="Top" Margin="40,643,580,0" Height="34"/>
+                <TextBlock Text="Year of Graduation :" VerticalAlignment="Top" Margin="40,686,902,0" Height="32" FontSize="20" Foreground="white"/>
+                <TextBox x:Name="txtYearGraduation" Style="{StaticResource CustomTextBoxStyle}" TextAlignment="Center" FontSize="15" VerticalAlignment="Top" Margin="40,723,885,0" Height="34"/>
+                <TextBlock Text="High School/University :" VerticalAlignment="Top" Margin="602,606,315,0" Height="32" FontSize="20" Foreground="white"/>
+                <TextBox x:Name="txtUniversity" Style="{StaticResource CustomTextBoxStyle}" TextAlignment="Center" FontSize="15" VerticalAlignment="Top" Margin="596,643,62,0" Height="34"/>
+                <TextBlock Text="Specialization :" VerticalAlignment="Top" Margin="291,686,707,0" Height="32" FontSize="20" Foreground="white"/>
+                <TextBox x:Name="txtSpecialization" Style="{StaticResource CustomTextBoxStyle}" TextAlignment="Center" FontSize="15" VerticalAlignment="Top" Margin="286,723,372,0" Height="34"/>
+                <TextBlock Text="Copy of Diploma :" VerticalAlignment="Top" Margin="40,772,911,0" Height="34" FontSize="20" Foreground="white"/>
+                <!-- Copy of Diploma -->
+                <!-- Upload document button 5-->
+                <Button x:Name="UploadButton5" Content="Upload Diploma" Style="{StaticResource UploadPictureButtonStyle}" FontSize="15" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="304,772,0,0" Click="UploadDocument_Click5" Width="166"/>
+                <!-- Label to display uploaded file name -->
+                <Label x:Name="FileNameLabel5" Content="" Foreground="White" VerticalAlignment="Top" Margin="503,772,216,0" Height="36" FontSize="15"/>
+                <!-- View document button -->
+                <Button x:Name="ViewButton5" Click="ViewDocument_Click5" VerticalAlignment="Top" Margin="975,770,119,0" Height="40" FontSize="15" Visibility="Visible">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Image Source="/View\Images\View-Icon.png" Stretch="Uniform" />
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                <!-- Emergeny Contact -->
+                <Label Content="Emergency Contact (Parents):" Foreground="White" FontSize="25" HorizontalAlignment="Left" VerticalAlignment="Top" Width="388" Height="53" RenderTransformOrigin="0.5,0.5" Margin="20,829,0,0"/>
+                <!-- First Name -->
+                <TextBlock Text="First Name :" VerticalAlignment="Top" Margin="44,880,954,0" Height="32" FontSize="20" Foreground="white"/>
+                <TextBox x:Name="txtEmergContactFname" Style="{StaticResource CustomTextBoxStyle}" TextAlignment="Center" FontSize="15" VerticalAlignment="Top" Margin="40,919,911,0" Height="34"/>
+                <!-- Middle Name -->
+                <TextBlock Text="Middle Name :" VerticalAlignment="Top" Margin="266,880,731,0" Height="32" FontSize="20" Foreground="white"/>
+                <TextBox x:Name="txtEmergContactMname" Style="{StaticResource CustomTextBoxStyle}" TextAlignment="Center" FontSize="15" VerticalAlignment="Top" Margin="260,919,695,0" Height="34"/>
+                <!-- Last Name -->
+                <TextBlock Text="Last Name :" VerticalAlignment="Top" Margin="480,880,518,0" Height="32" FontSize="20" Foreground="white"/>
+                <TextBox x:Name="txtEmergContactLname" Style="{StaticResource CustomTextBoxStyle}" TextAlignment="Center" FontSize="15" VerticalAlignment="Top" Margin="476,919,477,0" Height="34"/>
+                <!-- Relation -->
+                <TextBlock Text="Relation :" VerticalAlignment="Top" Margin="44,963,954,0" Height="32" FontSize="20" Foreground="white"/>
+                <TextBox x:Name="txtEmergContactRelation" Style="{StaticResource CustomTextBoxStyle}" TextAlignment="Center" FontSize="15" VerticalAlignment="Top" Margin="40,998,811,0" Height="34"/>
+                <!-- Phone -->
+                <TextBlock Text="Phone :" VerticalAlignment="Top" Margin="700,880,299,0" Height="32" FontSize="20" Foreground="white"/>
+                <TextBox x:Name="txtEmergContactPhone" Style="{StaticResource CustomTextBoxStyle}" TextAlignment="Center" FontSize="15" VerticalAlignment="Top" Margin="692,919,62,0" Height="34"/>
+                <!-- CIN -->
+                <TextBlock Text="ID Card (CIN):" VerticalAlignment="Top" Margin="366,963,631,0" Height="32" FontSize="20" Foreground="white"/>
+                <TextBox x:Name="txtEmergContactCIN" Style="{StaticResource CustomTextBoxStyle}" TextAlignment="Center" FontSize="15" VerticalAlignment="Top" Margin="359,998,584,0" Height="34"/>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Window>

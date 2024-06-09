@@ -1,0 +1,182 @@
+﻿<Window x:Class="EduTrack.SignUpPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EduTrack"
+        mc:Ignorable="d"
+        Title="SignUpPage" Height="375" Width="605" WindowStyle="None" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="CornflowerBlue">
+    <Border
+            Background="#272B2F" Margin="0,0,262,0">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="15"
+                              Direction ="-90" 
+                              RenderingBias ="Quality" 
+                              ShadowDepth ="2" 
+                              Color ="Gray" />
+        </Border.Effect>
+        <StackPanel Orientation="Vertical"
+                    Margin="14,1,15,0"
+                    Background="#272B2F">
+            <TextBlock Text="Sign Up" 
+                       FontSize="30"
+                       HorizontalAlignment="Center"
+                       FontWeight="Bold"
+                       Padding="10"
+                       Foreground="CornflowerBlue" Height="62" Width="128"
+                       />
+            <Grid VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Image Source="Image/Icons/user.png" Width="16" Height="16" VerticalAlignment="Top" Margin="-2,25,300,0" RenderTransformOrigin="-9.125,0.562"/>
+                <TextBlock Text="UserName" 
+                   Grid.Row="0"
+                   Margin="20,26,0,4"
+                   HorizontalAlignment="Left"
+                   Foreground="White"/>
+                <TextBox
+                  Name="UserName"
+                  Grid.Row="1"
+                  Background="#272B2F"
+                  Padding="0,5"
+                  Width="254"
+                  BorderThickness="0,0,0,1"
+                  HorizontalAlignment="Center"
+                  Text="" Margin="0,2,0,44" 
+                  Grid.RowSpan="2"
+                  Foreground="White"/>
+                <Image Source="/Image/Icons/padlock.png" Width="16" Height="16" VerticalAlignment="Top" Margin="-2,50,300,0" RenderTransformOrigin="-9.125,0.562" Grid.Row="2"/>
+                <TextBlock Text="Password" 
+                   Grid.Row="2"
+                   Margin="20,52,0,5"
+                   HorizontalAlignment="Left"
+                           Foreground="White"/>
+                <PasswordBox 
+                      Name="Password"
+                      Grid.Row="3"
+                      Password=""
+                      Padding="0,5"                           
+                      Width="254"
+                    Background="#272B2F"
+                      BorderThickness="0,0,0,1"
+                      HorizontalAlignment="Center"
+                    Foreground="White"/>
+            </Grid>
+            <!--Sign Up Button-->
+            <Button x:Name="SignUpBtn" 
+                    Content="Sign Up" 
+                    Foreground="White"
+                    FontSize="16"
+                    Background="CornflowerBlue"
+                    Margin="0,10,0,2"
+                    Height="35"
+                    Width="250"
+                    Click="SignUpBtn_Click_1" HorizontalAlignment="Center">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type Button}">
+                                    <Border x:Name="LoginBorder" Background="{TemplateBinding Background}"
+                                            CornerRadius="16">
+                                        <ContentPresenter HorizontalAlignment="Center" 
+                                                          VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="AliceBlue" TargetName="LoginBorder"  />
+                                            <Setter Property="TextBlock.Foreground" Value="Black"  TargetName="LoginBorder" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <!--SignUp Text-->
+            <TextBlock Text="You already have an account?" 
+                        FontSize="8"
+                        HorizontalAlignment="Center"
+                        FontWeight="Bold"
+                        Foreground="White" 
+                       Height="11" 
+                       Width="111" 
+                       Margin="0,2,0,0"/>
+            <!--Sign Up Button-->
+            <Button x:Name="LoginBtn" 
+                    Content="Login" 
+                    Foreground="CornflowerBlue"
+                    FontSize="16"
+                    Background="#272B2F"
+                    Height="26"
+                    Width="91"
+                    Click="Login_Click_1" HorizontalAlignment="Center">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type Button}">
+                                    <Border x:Name="LoginBorder" Background="{TemplateBinding Background}"
+                                CornerRadius="16">
+                                        <ContentPresenter HorizontalAlignment="Center" 
+                                              VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="AliceBlue" TargetName="LoginBorder"  />
+                                            <Setter Property="TextBlock.Foreground" Value="Black"  TargetName="LoginBorder" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <!--Close Button-->
+            <Button x:Name="CloseBtn" 
+                    Content="Close" 
+                    Foreground="White"
+                    FontSize="16"
+                    Background="#80CBC4"
+                    Margin="0,15,0,15"
+                    Height="35"
+                    Width="106"
+                    Click="CloseBtn_Click_2" HorizontalAlignment="Center">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type Button}">
+                                    <Border x:Name="LoginBorder" Background="{TemplateBinding Background}"
+                                CornerRadius="16">
+                                        <ContentPresenter HorizontalAlignment="Center" 
+                                              VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="AliceBlue" TargetName="LoginBorder"  />
+                                            <Setter Property="TextBlock.Foreground" Value="Black"  TargetName="LoginBorder" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="53*"/>
+                    <ColumnDefinition Width="37*"/>
+                </Grid.ColumnDefinitions>
+                <Image Source="Image/Logo.png" Stretch="Fill" Margin="147,-306,-279,59" Grid.Column="1"/>
+            </Grid>
+        </StackPanel>
+    </Border>
+</Window>

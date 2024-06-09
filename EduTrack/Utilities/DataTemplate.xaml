@@ -1,0 +1,70 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vm="clr-namespace:EduTrack.ViewModel"
+                    xmlns:view="clr-namespace:EduTrack.View">
+    
+    <DataTemplate DataType="{x:Type vm:HomeVM}">
+        <view:Home />
+    </DataTemplate>
+    
+    <DataTemplate DataType="{x:Type vm:MembersVM}">
+        <view:Members/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:ClassVM}">
+        <view:Class/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:TeachersVM}">
+        <view:Teachers/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:StudentsVM}">
+        <view:Students />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:AboutVM}">
+        <view:About/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:SettingsVM}">
+        <view:Settings/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:NewEmployeeVM}">
+        <view:NewEmployee/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:ShowEmployeesVM}">
+        <view:ShowEmployees/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:NewClassVM}">
+        <view:NewClass/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:ShowClassesVM}">
+        <view:ShowClasses/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:NewTeachersVM}">
+        <view:NewTeacher/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:ShowTeachersVM}">
+        <view:ShowTeachers/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:NewStudentVM}">
+        <view:NewStudent/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:ShowStudentsVM}">
+        <view:ShowStudents/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:BackupVM}">
+        <view:Backup/>
+    </DataTemplate>
+
+</ResourceDictionary>

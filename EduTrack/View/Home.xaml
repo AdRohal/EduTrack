@@ -1,0 +1,55 @@
+﻿<UserControl x:Class="EduTrack.View.Home"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:EduTrack.View"
+             mc:Ignorable="d" Width="1348" Height="740">
+    <Grid>
+        <!-- <ScrollViewer VerticalScrollBarVisibility="Auto">-->
+        <StackPanel>
+
+            <!-- Placeholder for the video -->
+            <Border CornerRadius="20" Width="1048" Height="680" Background="#212529">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="0*"/>
+                        <ColumnDefinition Width="0*"/>
+                        <ColumnDefinition Width="900"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Click="PrevButton_Click" Grid.Column="0" Margin="-170,315,56,293" Style="{StaticResource BubblyButtonStyle}" Background="Transparent">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <Image Source="/Image/Buttons/Left-Arrow.png" Stretch="Uniform" Width="70" Height="70"/>
+                    </Button>
+                    <Image x:Name="SlideImage1" Source="/Image/Home_Page.png" Stretch="Uniform" Grid.Column="1" Visibility="Visible" Grid.ColumnSpan="3" Margin="-13,24,-163,-4"/>
+                    <Image x:Name="SlideImage2" Source="/Image/2.png" Stretch="Uniform" Visibility="Collapsed" Margin="8,32,-158,0" Grid.ColumnSpan="4" Height="650" VerticalAlignment="Top"/>
+                    <Image x:Name="SlideImage3" Source="/Image/3.png" Stretch="Uniform" Grid.Column="3" Visibility="Collapsed" Margin="-2,30,-170,0"/>
+                    <Image x:Name="SlideImage4" Source="/Image/4.png" Stretch="Uniform" Grid.Column="3" Visibility="Collapsed" Margin="-2,30,-170,0"/>
+                    <Button Click="NextButton_Click" Grid.Column="3" Margin="1125,315,-296,293" Style="{StaticResource BubblyButtonStyle}" Background="Transparent">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <Image Source="/Image/Buttons/Right-Arrow.png" Stretch="Uniform" Width="83" Height="70"/>
+                    </Button>
+
+                </Grid>
+            </Border>
+
+            <!-- Text block to display current slide position -->
+            <TextBlock x:Name="SlideIndicator" Text="{Binding CurrentSlideIndicator}" FontSize="18" Grid.Column="4" Foreground="White" Width="70" Height="42"/>
+
+            <!-- Placeholder for the video -->
+            <!-- <MediaElement x:Name="VideoPlayer" Source="/Videos/Intro.mp4" Width="1236" Height="665" Grid.Column="5" Margin="0,20" IsMuted="True" LoadedBehavior="Play" UnloadedBehavior="Manual"/>
+                <Button Content="Play" Style="{StaticResource BubblyButtonStyle}" Click="VideoButton_Click" FontSize="20" Width="307" Height="39" RenderTransformOrigin="0.5,0.465"/> -->
+        </StackPanel>
+        <!-- </ScrollViewer> -->
+    </Grid>
+</UserControl>

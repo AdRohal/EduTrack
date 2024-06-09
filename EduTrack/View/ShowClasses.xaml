@@ -1,0 +1,109 @@
+﻿<UserControl x:Class="EduTrack.View.ShowClasses"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:EduTrack.View" Height="679" Width="1174"  Background="#212529">
+    <Grid Margin="0,0,0,-242">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,0,243" Background="#212529">
+            <Grid Width="1164" Height="923">
+                <Border CornerRadius="15" Background="#272B2F" Margin="808,14,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="33" Width="356">
+                    <TextBox x:Name="SearchBox" BorderThickness="0" Padding="5" TextChanged="SearchBox_TextChanged" Margin="10,4,10,2" Background="#272B2F" Foreground="White"/>
+                </Border>
+                <Button Style="{StaticResource RefreshButtonStyle}" Click="Refresh_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="773,14,0,0" Height="29" Width="24"/>
+                <Label Content="List of Classes : " Foreground="White" FontSize="30" HorizontalAlignment="Left" VerticalAlignment="Top" Width="288" Height="53" RenderTransformOrigin="0.5,0.5" Margin="16,10,0,0"/>
+                <Grid Background="#272B2F" Margin="24,68,24,787">
+                    <Label Content="Class Name :" Foreground="White" FontSize="20" Margin="10,16,899,10"/>
+                    <ComboBox Name="comboBoxClass" HorizontalAlignment="Left" VerticalAlignment="Top" Width="217" Height="30" Margin="175,20,0,0" Style="{StaticResource ComboBox}" SelectionChanged="comboBoxClass_SelectionChanged"/>
+                    <ComboBox Name="comboBoxTeacherStudent" HorizontalAlignment="Left" VerticalAlignment="Top" Width="222" Height="30" Margin="455,22,0,0" Style="{StaticResource ComboBox}"/>
+                    <CheckBox Content="Teacher" Name="checkBoxTeacher" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="456,4,0,0" Foreground="White" FontSize="14" Checked="checkBoxTeacher_Checked" Unchecked="checkBoxTeacher_Unchecked"/>
+                    <CheckBox Content="Student" Name="checkBoxStudent" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="601,4,0,0" Foreground="White" FontSize="14" Checked="checkBoxStudent_Checked" Unchecked="checkBoxStudent_Unchecked"/>
+                    <Button Content="Add" HorizontalAlignment="Left" VerticalAlignment="Top" Width="137" Height="36" Margin="902,14,0,0" Click="AddTeacherOrStudent_Click" Foreground="White" FontSize="20" Style="{StaticResource UploadPictureButtonStyle}"/>
+                    <Button x:Name="deleteButton" Content="Delete" HorizontalAlignment="Left" VerticalAlignment="Center" Width="138" Click="deleteButton_Click" Style="{StaticResource UploadPictureButtonStyleRed}" Margin="734,0,0,0"/>
+
+
+                </Grid>
+                <Label Content="Teachers List :" Foreground="White" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="24,136,0,0" Width="168"/>
+                <ScrollViewer x:Name="TeachersScrollViewer" VerticalScrollBarVisibility="Auto" Margin="10,174,10,427" PanningMode="VerticalFirst" MouseEnter="ScrollViewer_MouseEnter" PreviewMouseWheel="ListBox_PreviewMouseWheel">
+                    <ListBox x:Name="TeachersList" Background="#212529" BorderBrush="{x:Null}" Width="1144" Height="381">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#272B2F" BorderThickness="1" Margin="5" Padding="5" CornerRadius="10">
+                                    <StackPanel Width="200" Height="300">
+                                        <Grid Width="150" Height="150" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0">
+                                            <Ellipse Fill="#808BA8"/>
+                                            <Image x:Name="uploadedImage" Stretch="UniformToFill" Source="{Binding P_Pic}">
+                                                <Image.Clip>
+                                                    <EllipseGeometry RadiusX="75" RadiusY="75" Center="75,75"/>
+                                                </Image.Clip>
+                                            </Image>
+                                        </Grid>
+                                        <Label Content="Full Name :" FontWeight="Bold" Foreground="White"/>
+                                        <TextBlock Foreground="White" TextAlignment="Center">
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="{}{0} {1} {2}">
+                                                    <Binding Path="FirstName"  />
+                                                    <Binding Path="MiddleName" />
+                                                    <Binding Path="LastName" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                        <Label Content="Email :" FontWeight="Bold" Foreground="White"/>
+                                        <TextBlock Text="{Binding Email}" Foreground="White" TextAlignment="Center" />
+                                        <Label Content="Phone :" FontWeight="Bold" Foreground="White" />
+                                        <TextBlock Text="{Binding Phone}" Foreground="White" TextAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </ScrollViewer>
+                <Label Content="Students List :" Foreground="White" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="24,496,0,0" Width="168"/>
+                <ScrollViewer x:Name="StudentsScrollViewer"  MouseEnter="ScrollViewer_MouseEnter" PreviewMouseWheel="ListBox_PreviewMouseWheel" Margin="0,532,10,65" >
+                    <ListBox x:Name="StudentsList" Background="#212529" BorderBrush="{x:Null}" Height="344" Width="1154">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#272B2F" BorderThickness="1" Margin="5" Padding="5" CornerRadius="10">
+                                    <StackPanel Width="200" Height="300">
+                                        <Grid Width="150" Height="150" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0">
+                                            <Ellipse Fill="#808BA8"/>
+                                            <Image x:Name="uploadedImage" Stretch="UniformToFill" Source="{Binding P_Pic}">
+                                                <Image.Clip>
+                                                    <EllipseGeometry RadiusX="75" RadiusY="75" Center="75,75"/>
+                                                </Image.Clip>
+                                            </Image>
+                                        </Grid>
+                                        <Label Content="Full Name :" FontWeight="Bold" Foreground="White"/>
+                                        <TextBlock Foreground="White" TextAlignment="Center">
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="{}{0} {1} {2}">
+                                                    <Binding Path="F_Name"  />
+                                                    <Binding Path="M_Name" />
+                                                    <Binding Path="L_Name" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                        <Label Content="Email :" FontWeight="Bold" Foreground="White"/>
+                                        <TextBlock Text="{Binding Email}" Foreground="White" TextAlignment="Center" />
+                                        <Label Content="Phone :" FontWeight="Bold" Foreground="White" />
+                                        <TextBlock Text="{Binding Phone}" Foreground="White" TextAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </ScrollViewer>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
