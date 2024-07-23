@@ -34,7 +34,7 @@
             </Grid.ColumnDefinitions>
             <Grid HorizontalAlignment="Left"
                   Width="228">
-                <Border Background="#272B2F"
+                <Border Background="#2b2f30"
                         CornerRadius="20,0,0,20" >
                     <Image Source="Image/Logo4.png" Margin="28,20,28,703"/>
                 </Border>
@@ -62,7 +62,7 @@
                             <Image Source="Image/member-icon.png"
                                 Style="{StaticResource Image_Style}" Margin="22,0,0,0" />
                             <TextBlock 
-                                Style="{StaticResource Text_Style}" HorizontalAlignment="Stretch" Margin="70,18,30,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Text="Employee" Height="24"/>
+                                Style="{StaticResource Text_Style}" HorizontalAlignment="Stretch" Margin="70,18,30,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Text="Employees" Height="24"/>
                         </Grid>
                     </Menu:Btn>
                     <!--// Class //-->
@@ -104,7 +104,7 @@
                             <Image Source="Image/img_setting.png"
                                    Style="{StaticResource Image_Style}" />
                             <TextBlock Text="Settings" 
-                                       Style="{StaticResource Text_Style}" HorizontalAlignment="Stretch" Margin="70,16,86,10" VerticalAlignment="Stretch"/>
+                                       Style="{StaticResource Text_Style}" HorizontalAlignment="Stretch" Margin="70,18,74,2" VerticalAlignment="Stretch"/>
                         </Grid>
                     </Menu:Btn>
                     <Menu:Btn Style="{StaticResource BtnStyle}"
@@ -146,7 +146,7 @@
                     <TextBlock Text="{Binding ConnectedUsername}" Foreground="#10CCFC"/>
                     <!--Sign out-->
                     <Grid>
-                        <Button Content="Sign Out" Click="SignOut_Click" FontSize="11" Foreground="white" Background="#444C54" Margin="0,8,0,0" >
+                        <Button Content="Se Déconnecter" Click="SignOut_Click" FontSize="11" Foreground="white" Background="#444C54" Margin="0,8,0,0" >
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="Template">

@@ -59,9 +59,6 @@
   <PropertyGroup>
     <ApplicationIcon>1.ico</ApplicationIcon>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>EduTrack.App</StartupObject>
-  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Bogus">
       <Version>35.5.1</Version>
@@ -74,7 +71,10 @@
       <Version>1.0.1</Version>
     </PackageReference>
     <PackageReference Include="MySql.Data">
-      <Version>8.3.0</Version>
+      <Version>9.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="MySql.Data.EntityFramework">
+      <Version>9.0.0</Version>
     </PackageReference>
     <Reference Include="netstandard" />
     <Reference Include="System" />
@@ -105,7 +105,12 @@
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\Class.cs" />
+    <Compile Include="Models\ClassInfo.cs" />
     <Compile Include="Models\EmployeeOrTeacher.cs" />
+    <Compile Include="Models\Grade.cs" />
+    <Compile Include="Models\Module.cs" />
+    <Compile Include="Models\ScheduleSlot.cs" />
     <Compile Include="Models\Student.cs" />
     <Compile Include="Models\Teacher.cs" />
     <Compile Include="Models\Employee.cs" />
@@ -117,11 +122,13 @@
     <Compile Include="Utilities\ViewModelBase.cs" />
     <Compile Include="ViewModel\BackupVM.cs" />
     <Compile Include="ViewModel\ClassVM.cs" />
+    <Compile Include="ViewModel\GradesVM.cs" />
     <Compile Include="ViewModel\MembersVM.cs" />
     <Compile Include="ViewModel\NewClassVM.cs" />
     <Compile Include="ViewModel\NewEmployeeVM.cs" />
     <Compile Include="ViewModel\NewStudentVM.cs" />
     <Compile Include="ViewModel\NewTeachersVM.cs" />
+    <Compile Include="ViewModel\ScheduleClassesVM.cs" />
     <Compile Include="ViewModel\SettingsVM.cs" />
     <Compile Include="ViewModel\ShowClassesVM.cs" />
     <Compile Include="ViewModel\ShowEmployeesVM.cs" />
@@ -137,6 +144,12 @@
     </Compile>
     <Compile Include="View\Class.xaml.cs">
       <DependentUpon>Class.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ClassesGrades.xaml.cs">
+      <DependentUpon>ClassesGrades.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ClassesSchedule.xaml.cs">
+      <DependentUpon>ClassesSchedule.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\DetailedEmployeeInfoView.xaml.cs">
       <DependentUpon>DetailedEmployeeInfoView.xaml</DependentUpon>
@@ -266,6 +279,14 @@
     <Page Include="View\Class.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ClassesGrades.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ClassesSchedule.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="View\DetailedEmployeeInfoView.xaml">
       <SubType>Designer</SubType>

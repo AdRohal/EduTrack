@@ -8,10 +8,10 @@
     <Grid>
         <Border Background="#212529" CornerRadius="20" HorizontalAlignment="Center" Width="1397">
             <Grid Margin="20">
-                <TextBlock Text="About EduTrack" FontSize="30" Foreground="#10ccfc" FontWeight="Bold" Width="244" Margin="556,0,557,592"/>
+                <TextBlock Text="About EduTrack" FontSize="30" Foreground="#10ccfc" FontWeight="Bold" Margin="528,0,491,592"/>
 
-                <TextBlock Text="                EduTrack is an educational management system designed to streamline the process of managing an educational institution. It provides functionalities for managing students, teachers, classes, and transactions. With EduTrack, you can easily keep track of student and teacher information, class schedules, and financial transactions, all in one place." 
-                   FontSize="20" Foreground="White" TextWrapping="Wrap" Margin="45,76,45,480" Width="1267" Height="81"/>
+                <TextBlock Text="            EduTrack is an educational management system designed to streamline the management process of an educational institution. It provides features to manage students, teachers, classes, and transactions. With EduTrack, you can easily track student and teacher information, class schedules, and financial transactions, all in one place." 
+           FontSize="20" Foreground="White" TextWrapping="Wrap" Margin="45,76,45,480" Width="1267" Height="81"/>
                 <Button Height="100" Click="OpenLink1" Margin="790,196,467,341" BorderBrush="Transparent">
                     <Button.Style>
                         <Style TargetType="Button">
@@ -53,10 +53,10 @@
                     </Button.Style>
                     <Image Source="\Image\Icons\icon-paypal.png" Stretch="Uniform"/>
                 </Button>
-                <TextBlock Text="Contact us :" VerticalAlignment="Top" Margin="45,177,1135,0" Height="38" FontSize="25" FontWeight="Bold" Foreground="white"/>
+                <TextBlock Text="Contact us :" VerticalAlignment="Top" Margin="45,177,1029,0" Height="38" FontSize="25" FontWeight="Bold" Foreground="white"/>
                 <TextBlock Text="Adamrohal581@gmail.com" VerticalAlignment="Top" Margin="75,257,1058,0" Height="23" FontSize="15" Foreground="white"/>
                 <TextBlock Text="Email :" VerticalAlignment="Top" Margin="60,220,1227,0" Height="32" FontSize="20" Foreground="#10ccfc"/>
-                <TextBlock Text="Phone :" VerticalAlignment="Top" Margin="60,286,1203,0" Height="32" FontSize="20" Foreground="#10ccfc"/>
+                <TextBlock Text="Phone :" VerticalAlignment="Top" Margin="60,286,1127,0" Height="32" FontSize="20" Foreground="#10ccfc"/>
                 <TextBlock Text="+212 671645861" VerticalAlignment="Top" Margin="75,323,1157,0" Height="23" FontSize="15" Foreground="white"/>
                 <Image Source="\Image\QR-code.png" Stretch="Uniform" Margin="934,188,37,47" />
             </Grid>

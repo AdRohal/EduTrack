@@ -32,5 +32,15 @@ namespace EduTrack.View
         {
             Pages.Content = new ShowClassesVM();
         }
+
+        private void Btn_Checked_2(object sender, RoutedEventArgs e)
+        {
+            Pages.Content = new ScheduleClassesVM();
+        }
+
+        private void Btn_Checked_3(object sender, RoutedEventArgs e)
+        {
+            Pages.Content = new GradesVM();
+        }
     }
 }

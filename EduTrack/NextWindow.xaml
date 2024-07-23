@@ -22,7 +22,7 @@
                        HorizontalAlignment="Center"
                        FontWeight="Bold"
                        Padding="10"
-                       Foreground="CornflowerBlue" Height="62" Width="98"
+                       Foreground="CornflowerBlue" Height="62" Width="100"
                        />
             <Grid VerticalAlignment="Center">
                 <Grid.RowDefinitions>
@@ -32,11 +32,11 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Image Source="Image/Icons/user.png" Width="16" Height="16" VerticalAlignment="Top" Margin="-2,25,300,0" RenderTransformOrigin="-9.125,0.562"/>
-                <TextBlock Text="UserName" 
+                <TextBlock Text="Username" 
                    Grid.Row="0"
                    Margin="20,26,0,4"
                    HorizontalAlignment="Left"
-                   Foreground="White"/>
+                   Foreground="White" Width="79"/>
                 <TextBox
                   Name="UserName"
                   Grid.Row="1"
@@ -51,7 +51,7 @@
                    Grid.Row="2"
                    Margin="20,52,0,5"
                    HorizontalAlignment="Left"
-                   Foreground="White"/>
+                   Foreground="White" Width="68"/>
                 <PasswordBox 
                       Name="Password"
                       Grid.Row="3"
@@ -97,17 +97,17 @@
                 </Button.Style>
             </Button>
             <!--SignUp Text-->
-            <TextBlock Text="You don't have an account yet?" 
+            <TextBlock Text="You don't have an account Already ?" 
                         FontSize="8"
                         HorizontalAlignment="Center"
                         FontWeight="Bold"
                         Foreground="White" 
-                       Height="11" 
-                       Width="118"
+                       Height="13" 
+                       Width="143"
                        Margin="0,2,0,0"/>
             <!--Sign Up Button-->
             <Button x:Name="SignUpBtn" 
-                    Content="Sign Up" 
+                    Content="Signup" 
                     Foreground="CornflowerBlue"
                     FontSize="16"
                     Background="#272B2F"

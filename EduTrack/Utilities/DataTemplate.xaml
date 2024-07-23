@@ -67,4 +67,12 @@
         <view:Backup/>
     </DataTemplate>
 
+    <DataTemplate DataType="{x:Type vm:ScheduleClassesVM}">
+        <view:ClassesSchedule/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:GradesVM}">
+        <view:ClassesGrades/>
+    </DataTemplate>
+
 </ResourceDictionary>

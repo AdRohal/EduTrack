@@ -10,7 +10,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Image Source="Image/LoadingScreen.png" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Width="627" Height="392"/>
+        <Image Source="Image/LoadingScreen.png" Stretch="Uniform" HorizontalAlignment="Left" VerticalAlignment="Center" Width="725" Margin="-14,0,0,0" Height="392"/>
         <ProgressBar Name="progressBar" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,361,0,0" Height="13" Width="600" ValueChanged="ProgressBar_ValueChanged" Foreground="Blue"/>
         <Label x:Name="progressLabel" Content="Loading..." HorizontalAlignment="Left" VerticalAlignment="Top" Margin="530,330,0,0" Foreground="White"/>
     </Grid>

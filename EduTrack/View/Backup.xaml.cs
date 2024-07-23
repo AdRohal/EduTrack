@@ -8,6 +8,7 @@ using System.Xml;
 using MySql.Data.MySqlClient;
 using Microsoft.Win32;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace EduTrack.View
 {
@@ -71,7 +72,7 @@ namespace EduTrack.View
 
                     Directory.CreateDirectory(directoryPath);
 
-                    string path = Path.Combine(directoryPath, "TeacherData.xml");
+                    string path = Path.Combine(directoryPath, "teacher_registry.xml");
 
                     using (StreamWriter outputFile = new StreamWriter(path))
                     {
@@ -83,7 +84,16 @@ namespace EduTrack.View
                             outputFile.WriteLine("\t<Teacher>");
                             foreach (DataColumn column in dt.Columns)
                             {
-                                outputFile.WriteLine($"\t\t<{column.ColumnName}>{row[column]}</{column.ColumnName}>");
+                                string value = row[column].ToString();
+                                if (column.DataType == typeof(DateTime))
+                                {
+                                    DateTime date;
+                                    if (DateTime.TryParse(value, out date))
+                                    {
+                                        value = date.ToString("yyyy-MM-dd");
+                                    }
+                                }
+                                outputFile.WriteLine($"\t\t<{column.ColumnName}>{value}</{column.ColumnName}>");
                             }
                             outputFile.WriteLine("\t</Teacher>");
                         }
@@ -99,6 +109,7 @@ namespace EduTrack.View
                 }
             }
         }
+
         private void DownloadEmployeeData()
         {
             string query = "SELECT * FROM employee_registry";
@@ -119,7 +130,7 @@ namespace EduTrack.View
 
                     Directory.CreateDirectory(directoryPath);
 
-                    string path = Path.Combine(directoryPath, "EmployeeData.xml");
+                    string path = Path.Combine(directoryPath, "employee_registry.xml");
 
                     using (StreamWriter outputFile = new StreamWriter(path))
                     {
@@ -131,6 +142,15 @@ namespace EduTrack.View
                             outputFile.WriteLine("\t<Employee>");
                             foreach (DataColumn column in dt.Columns)
                             {
+                                string value = row[column].ToString();
+                                if (column.DataType == typeof(DateTime))
+                                {
+                                    DateTime date;
+                                    if (DateTime.TryParse(value, out date))
+                                    {
+                                        value = date.ToString("yyyy-MM-dd");
+                                    }
+                                }
                                 outputFile.WriteLine($"\t\t<{column.ColumnName}>{row[column]}</{column.ColumnName}>");
                             }
                             outputFile.WriteLine("\t</Employee>");
@@ -168,7 +188,7 @@ namespace EduTrack.View
 
                     Directory.CreateDirectory(directoryPath);
 
-                    string path = Path.Combine(directoryPath, "StudentData.xml");
+                    string path = Path.Combine(directoryPath, "student_registry.xml");
 
                     using (StreamWriter outputFile = new StreamWriter(path))
                     {
@@ -180,6 +200,15 @@ namespace EduTrack.View
                             outputFile.WriteLine("\t<Student>");
                             foreach (DataColumn column in dt.Columns)
                             {
+                                string value = row[column].ToString();
+                                if (column.DataType == typeof(DateTime))
+                                {
+                                    DateTime date;
+                                    if (DateTime.TryParse(value, out date))
+                                    {
+                                        value = date.ToString("yyyy-MM-dd");
+                                    }
+                                }
                                 outputFile.WriteLine($"\t\t<{column.ColumnName}>{row[column]}</{column.ColumnName}>");
                             }
                             outputFile.WriteLine("\t</Student>");
@@ -214,31 +243,50 @@ namespace EduTrack.View
                 return;
             }
 
+            string tableName = Path.GetFileNameWithoutExtension(filePath);
+
             DataSet ds = new DataSet();
             ds.ReadXml(filePath);
 
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            try
             {
-                try
-                {
-                    connection.Open();
+                connection.Open();
 
-                    foreach (DataTable dt in ds.Tables)
-                    {
-                        foreach (DataRow row in dt.Rows)
-                        {
-                            string query = $"INSERT INTO {dt.TableName} ({string.Join(", ", dt.Columns.Cast<DataColumn>().Select(c => c.ColumnName))}) VALUES ({string.Join(", ", row.ItemArray)})";
-                            MySqlCommand command = new MySqlCommand(query, connection);
-                            command.ExecuteNonQuery();
-                        }
-                    }
-                    MessageBox.Show("Data has been imported successfully.");
-                }
-                catch (MySqlException ex)
+                DataTable dt = ds.Tables[0];
+                foreach (DataRow row in dt.Rows)
                 {
-                    MessageBox.Show("An error occurred while connecting to the database: " + ex.Message);
+                    var values = new List<string>();
+                    foreach (var item in row.ItemArray)
+                    {
+                        string value;
+                        if (item is DBNull)
+                        {
+                            value = "NULL";
+                        }
+                        else
+                        {
+                            value = item.ToString().Replace("'", "''");
+                            value = value.Replace("\\", "\\\\");
+                            value = $"'{value}'";
+                        }
+                        values.Add(value);
+                    }
+
+                    string query = $"INSERT INTO {tableName} ({string.Join(", ", dt.Columns.Cast<DataColumn>().Select(c => $"`{c.ColumnName}`"))}) VALUES ({string.Join(", ", values)})";
+                    MySqlCommand command = new MySqlCommand(query, connection);
+                    command.ExecuteNonQuery();
+                }
+                MessageBox.Show("Data has been imported successfully.");
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show("An error occurred while connecting to the database: " + ex.Message);
+            }
+            finally
+            {
+                if (connection.State == ConnectionState.Open)
+                {
+                    connection.Close();
                 }
             }
         }

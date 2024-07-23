@@ -13,6 +13,10 @@ namespace EduTrack.Models
         public string F_Name { get; set; }
         public string M_Name { get; set; }
         public string L_Name { get; set; }
+        public string FullName
+        {
+            get { return $"{F_Name} {L_Name}"; }
+        }
         public string Gender { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
@@ -39,6 +43,7 @@ namespace EduTrack.Models
         public string Emerg_Contact_CIN_F_Copy { get; set; }
         public string Emerg_Contact_CIN_B_Copy { get; set; }
         public string Class { get; set; }
+        public string Grade { get; set; }
     }
 
 }

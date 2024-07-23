@@ -18,12 +18,12 @@
         <StackPanel Orientation="Vertical"
                     Margin="14,1,15,0"
                     Background="#272B2F">
-            <TextBlock Text="Sign Up" 
+            <TextBlock Text="Create Account" 
                        FontSize="30"
                        HorizontalAlignment="Center"
                        FontWeight="Bold"
                        Padding="10"
-                       Foreground="CornflowerBlue" Height="62" Width="128"
+                       Foreground="CornflowerBlue" Height="62" Width="238"
                        />
             <Grid VerticalAlignment="Center">
                 <Grid.RowDefinitions>
@@ -33,7 +33,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Image Source="Image/Icons/user.png" Width="16" Height="16" VerticalAlignment="Top" Margin="-2,25,300,0" RenderTransformOrigin="-9.125,0.562"/>
-                <TextBlock Text="UserName" 
+                <TextBlock Text="Username" 
                    Grid.Row="0"
                    Margin="20,26,0,4"
                    HorizontalAlignment="Left"
@@ -99,7 +99,7 @@
                 </Button.Style>
             </Button>
             <!--SignUp Text-->
-            <TextBlock Text="You already have an account?" 
+            <TextBlock Text="You have an account Already ?" 
                         FontSize="8"
                         HorizontalAlignment="Center"
                         FontWeight="Bold"

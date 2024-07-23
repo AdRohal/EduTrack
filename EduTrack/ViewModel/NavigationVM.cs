@@ -37,6 +37,8 @@ namespace EduTrack.ViewModel
             NewStudentCommand = new RelayCommand(NewStudent);
             ShowStudentsCommand = new RelayCommand(ShowStudents);
             BackupCommand = new RelayCommand(Backup);
+            ClassesScheduleCommand = new RelayCommand(ClassesSchedule);
+            ClassesGradesCommand = new RelayCommand(Grades);
 
             // Startup Page
             CurrentView = new HomeVM();
@@ -80,6 +82,8 @@ namespace EduTrack.ViewModel
         public ICommand NewStudentCommand { get; set; }
         public ICommand ShowStudentsCommand { get; set; }
         public ICommand BackupCommand { get; set; }
+        public ICommand ClassesScheduleCommand { get; set; }
+        public ICommand ClassesGradesCommand { get; set; }
 
         private void Home(object obj) => CurrentView = new HomeVM();
         private void Class(object obj) => CurrentView = new ClassVM();
@@ -95,6 +99,8 @@ namespace EduTrack.ViewModel
         private void NewStudent(object obj) => CurrentView = new NewStudentVM();
         private void ShowStudents(object obj) => CurrentView = new ShowStudentsVM();
         private void Backup(object obj) => CurrentView = new BackupVM();
+        private void ClassesSchedule(object obj) => CurrentView = new ScheduleClassesVM();
+        private void Grades(object obj) => CurrentView = new GradesVM();
 
     }
 }

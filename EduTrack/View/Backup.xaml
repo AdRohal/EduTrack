@@ -13,14 +13,23 @@
                 <ComboBoxItem>teacher</ComboBoxItem>
                 <ComboBoxItem>student</ComboBoxItem>
             </ComboBox>
-            <TextBlock Text="Chose one here :" FontSize="20" Foreground="White" Margin="166,0,692,223"/>
+            <TextBlock Text="Chose Here :" FontSize="20" Foreground="White" Margin="166,0,692,223"/>
             <Button x:Name="downloadButton" Content="Download" Click="downloadButton_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Width="234" Margin="785,40,0,0" Height="42" Style="{StaticResource UploadPictureButtonStyle}"/>
             <Button x:Name="uploadButton" Content="Upload" HorizontalAlignment="Left" VerticalAlignment="Top" Width="274" Click="uploadButton_Click" Margin="166,155,0,0"  Style="{StaticResource UploadPictureButtonStyle}"/>
-            <TextBlock Text="Import XML here :" FontSize="20" Foreground="White" Margin="166,112,692,112"/>
-            <Button x:Name="importButton" Content="Import" HorizontalAlignment="Left" VerticalAlignment="Top" Width="234" Click="importButton_Click"  Style="{StaticResource UploadPictureButtonStyle}" Margin="785,155,0,0"/>
+            <TextBlock Text="Importe XML Here :" FontSize="20" Foreground="White" Margin="166,112,692,112"/>
+            <Button x:Name="importButton" Content="Importer" HorizontalAlignment="Left" VerticalAlignment="Top" Width="234" Click="importButton_Click"  Style="{StaticResource UploadPictureButtonStyle}" Margin="785,155,0,0"/>
             <TextBlock x:Name="fileNameTextBlock" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="469,155,0,0" Foreground="White" FontSize="20" Width="279" Height="36"/>
 
         </Grid>
-        <TextBlock Text="Back UP To XML" FontSize="30" Foreground="#10ccfc" FontWeight="Bold" Margin="435,10,479,622"/>
+        <TextBlock Text="Save To XML" FontSize="30" Foreground="#10ccfc" FontWeight="Bold" Margin="508,5,476,627" RenderTransformOrigin="0.5,0.5">
+            <TextBlock.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="0.031"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </TextBlock.RenderTransform>
+        </TextBlock>
     </Grid>
 </UserControl>

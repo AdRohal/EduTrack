@@ -32,7 +32,7 @@
                         <Grid>
                             <Image Source="Images/NewClass.png"
                                    Style="{StaticResource Image_Style}" />
-                            <TextBlock Text="New Class"
+                            <TextBlock Text="New Classe"
                                        Style="{StaticResource Text_Style}" />
                         </Grid>
                     </Menu:Btn>
@@ -46,13 +46,33 @@
                                        Style="{StaticResource Text_Style}" />
                         </Grid>
                     </Menu:Btn>
+                    <!--// Classess Schedule //-->
+                    <Menu:Btn Style="{StaticResource BtnStyle}"
+                            Command="{Binding ClassesScheduleCommand}" Width="211" Checked="Btn_Checked_2">
+                        <Grid>
+                            <Image Source="/Image/Icons/schedule-icon.png"
+                                    Style="{StaticResource Image_Style}" />
+                            <TextBlock Text="Schedule Classes"
+                                    Style="{StaticResource Text_Style}" />
+                        </Grid>
+                    </Menu:Btn>
+                    <!--// Classess Grades //-->
+                    <Menu:Btn Style="{StaticResource BtnStyle}"
+                        Command="{Binding ClassesGradesCommand}" Width="211" Checked="Btn_Checked_3" >
+                        <Grid>
+                            <Image Source="/Image/Icons/grades-icon.png"
+                                    Style="{StaticResource Image_Style}" />
+                            <TextBlock Text="Grades Classes"
+                                    Style="{StaticResource Text_Style}" />
+                        </Grid>
+                    </Menu:Btn>
                 </StackPanel>
             </Grid>
             <Grid Grid.Column="1">
                 <ContentControl x:Name="Pages"
                                 Content="{Binding CurrentView}" Margin="0,0,-549,0" />
             </Grid>
-            <Label Content="Classes:" FontSize="35" Foreground="White" Margin="24,35,31,517" />
+            <Label Content="Classes:" FontSize="35" Foreground="White" Margin="24,35,31,565" />
         </Grid>
     </Grid>
 </UserControl>

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\KrAda\\Desktop\\EduTrack\\EduTrack\\EduTrack.csproj": {}
+    "C:\\Users\\ULTRAPC\\Desktop\\EduTrack\\EduTrack\\EduTrack.csproj": {}
   },
   "projects": {
-    "C:\\Users\\KrAda\\Desktop\\EduTrack\\EduTrack\\EduTrack.csproj": {
+    "C:\\Users\\ULTRAPC\\Desktop\\EduTrack\\EduTrack\\EduTrack.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\KrAda\\Desktop\\EduTrack\\EduTrack\\EduTrack.csproj",
+        "projectUniqueName": "C:\\Users\\ULTRAPC\\Desktop\\EduTrack\\EduTrack\\EduTrack.csproj",
         "projectName": "EduTrack",
-        "projectPath": "C:\\Users\\KrAda\\Desktop\\EduTrack\\EduTrack\\EduTrack.csproj",
-        "packagesPath": "C:\\Users\\KrAda\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\KrAda\\Desktop\\EduTrack\\EduTrack\\obj\\",
+        "projectPath": "C:\\Users\\ULTRAPC\\Desktop\\EduTrack\\EduTrack\\EduTrack.csproj",
+        "packagesPath": "C:\\Users\\ULTRAPC\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ULTRAPC\\Desktop\\EduTrack\\EduTrack\\obj\\",
         "projectStyle": "PackageReference",
         "skipContentFileWrite": true,
         "fallbackFolders": [
@@ -19,7 +19,7 @@
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\KrAda\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ULTRAPC\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\DevExpress 23.2.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
@@ -64,7 +64,11 @@
             },
             "MySql.Data": {
               "target": "Package",
-              "version": "[8.3.0, )"
+              "version": "[9.0.0, )"
+            },
+            "MySql.Data.EntityFramework": {
+              "target": "Package",
+              "version": "[9.0.0, )"
             }
           },
           "imports": [
