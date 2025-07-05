@@ -7,7 +7,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Data.SqlClient;
 using MySql.Data.MySqlClient;
-
+using EduTrack.Data;
 
 namespace EduTrack.View
 {
@@ -16,13 +16,6 @@ namespace EduTrack.View
     /// </summary>
     public partial class NewEmployee : UserControl
     {
-        private const string DatabaseServer = "127.0.0.1";
-        private const string DatabaseName = "datebase";
-        private const string DatabaseUser = "root";
-        private const string DatabasePassword = "";
-
-        private readonly MySqlConnection connection;
-
         private string uploadedFileName;
         private string uploadedFileName1;
         private string uploadedFileName2;
@@ -33,9 +26,6 @@ namespace EduTrack.View
         public NewEmployee()
         {
             InitializeComponent();
-
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-            connection = new MySqlConnection(connectionString);
 
             DoubleAnimation fadeInAnimation = new DoubleAnimation
             {
@@ -73,9 +63,7 @@ namespace EduTrack.View
         {
             try
             {
-                string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     connection.Open();
 

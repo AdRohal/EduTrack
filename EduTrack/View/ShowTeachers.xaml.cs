@@ -6,6 +6,7 @@ using EduTrack.Models;
 using System.Windows;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using EduTrack.Data;
 
 namespace EduTrack.View
 {
@@ -14,11 +15,6 @@ namespace EduTrack.View
     /// </summary>
     public partial class ShowTeachers : UserControl
     {
-        private const string DatabaseServer = "127.0.0.1";
-        private const string DatabaseName = "datebase";
-        private const string DatabaseUser = "root";
-        private const string DatabasePassword = "";
-
         public ShowTeachers()
         {
             InitializeComponent();
@@ -47,7 +43,6 @@ namespace EduTrack.View
 
         private async Task LoadTeachersAsync(string searchText = null)
         {
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
             string query = "SELECT TeacherID, p_pic,f_name, m_name, l_name, gender, email, phone, b_date, nationality, cin, address, role, j_date, contract_start, contract_end, salary, Module FROM teacher_registry";
             if (!string.IsNullOrEmpty(searchText))
             {
@@ -58,7 +53,7 @@ namespace EduTrack.View
 
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
                     using (MySqlCommand command = new MySqlCommand(query, connection))

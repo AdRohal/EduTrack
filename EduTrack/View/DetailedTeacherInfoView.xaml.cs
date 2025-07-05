@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using EduTrack.Data;
 
 namespace EduTrack.View
 {
@@ -24,13 +25,6 @@ namespace EduTrack.View
     /// </summary>
     public partial class DetailedTeacherInfoView : Window
     {
-        private const string DatabaseServer = "127.0.0.1";
-        private const string DatabaseName = "datebase";
-        private const string DatabaseUser = "root";
-        private const string DatabasePassword = "";
-
-        private readonly MySqlConnection connection;
-
         private string uploadedFileName;
         private string uploadedFileName1;
         private string uploadedFileName2;
@@ -51,9 +45,6 @@ namespace EduTrack.View
             this.MaxHeight = 679;
 
             this.SizeToContent = SizeToContent.Manual;
-
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-            connection = new MySqlConnection(connectionString);
 
             DoubleAnimation fadeInAnimation = new DoubleAnimation
             {
@@ -101,17 +92,18 @@ namespace EduTrack.View
             MessageBoxResult result = MessageBox.Show("Are you sure you want to delete this Teacher?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result == MessageBoxResult.Yes)
             {
-                connection.Open();
+                using (var connection = DatabaseConnectionManager.CreateConnection())
+                {
+                    connection.Open();
 
-                MySqlCommand command = new MySqlCommand($"DELETE FROM teacher_registry WHERE TeacherID = @TeacherID", connection);
+                    MySqlCommand command = new MySqlCommand($"DELETE FROM teacher_registry WHERE TeacherID = @TeacherID", connection);
 
-                command.Parameters.AddWithValue("@TeacherID", teacherId);
+                    command.Parameters.AddWithValue("@TeacherID", teacherId);
 
-                command.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
 
-                connection.Close();
-
-                MessageBox.Show("Teacher has been deleted successfully.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Teacher has been deleted successfully.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
             }
         }
 
@@ -121,9 +113,7 @@ namespace EduTrack.View
         {
             try
             {
-                string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     connection.Open();
 
@@ -419,9 +409,7 @@ namespace EduTrack.View
         {
             try
             {
-                string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     connection.Open();
 

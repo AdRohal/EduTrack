@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using MySql.Data.MySqlClient;
+using EduTrack.Data;
 
 namespace EduTrack.View
 {
@@ -10,18 +11,9 @@ namespace EduTrack.View
     /// </summary>
     public partial class NewClass : UserControl
     {
-        private const string DatabaseServer = "127.0.0.1";
-        private const string DatabaseName = "datebase";
-        private const string DatabaseUser = "root";
-        private const string DatabasePassword = "";
-
-        private readonly MySqlConnection connection;
-
         public NewClass()
         {
             InitializeComponent();
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-            connection = new MySqlConnection(connectionString);
             UpdateLastClass();
         }
 
@@ -29,9 +21,7 @@ namespace EduTrack.View
         {
             try
             {
-                string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     connection.Open();
 
@@ -52,6 +42,7 @@ namespace EduTrack.View
                         if (rowsAffected > 0)
                         {
                             MessageBox.Show("Class information saved successfully!");
+                            UpdateLastClass();
                         }
                         else
                         {
@@ -70,33 +61,37 @@ namespace EduTrack.View
         {
             string sql = "SELECT * FROM classes ORDER BY ClassID DESC LIMIT 1";
 
-            using (connection)
+            try
             {
-                connection.Open();
-
-                using (MySqlCommand command = new MySqlCommand(sql, connection))
+                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
-                    using (MySqlDataReader reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            string className = reader["ClassName"].ToString();
-                            string major = reader["major"].ToString();
-                            string description = reader["Description"].ToString();
-                            string createdDate = ((DateTime)reader["CreatedDate"]).ToString("g");
+                    connection.Open();
 
-                            txtLastClass.Text = $"Name: {className}\nMajor: {major}\nDescription: {description}\nCreated Date: {createdDate}";
-                        }
-                        else
+                    using (MySqlCommand command = new MySqlCommand(sql, connection))
+                    {
+                        using (MySqlDataReader reader = command.ExecuteReader())
                         {
-                            txtLastClass.Text = "No Class Found";
+                            if (reader.Read())
+                            {
+                                string className = reader["ClassName"].ToString();
+                                string major = reader["major"].ToString();
+                                string description = reader["Description"].ToString();
+                                string createdDate = ((DateTime)reader["CreatedDate"]).ToString("g");
+
+                                txtLastClass.Text = $"Name: {className}\nMajor: {major}\nDescription: {description}\nCreated Date: {createdDate}";
+                            }
+                            else
+                            {
+                                txtLastClass.Text = "No Class Found";
+                            }
                         }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                txtLastClass.Text = "Error loading last class";
+            }
         }
-
-
-
     }
 }

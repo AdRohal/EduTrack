@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using EduTrack.ViewModel;
 using Microsoft.Win32;
 using MySql.Data.MySqlClient;
+using EduTrack.Data;
 
 namespace EduTrack.View
 {
@@ -26,13 +27,6 @@ namespace EduTrack.View
     /// </summary>
     public partial class NewStudent : UserControl
     {
-        private const string DatabaseServer = "127.0.0.1";
-        private const string DatabaseName = "datebase";
-        private const string DatabaseUser = "root";
-        private const string DatabasePassword = "";
-
-        private readonly MySqlConnection connection;
-
         private string uploadedFileName;
         private string uploadedFileName1;
         private string uploadedFileName2;
@@ -45,9 +39,6 @@ namespace EduTrack.View
         public NewStudent()
         {
             InitializeComponent();
-
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-            connection = new MySqlConnection(connectionString);
 
             DoubleAnimation fadeInAnimation = new DoubleAnimation
             {
@@ -62,7 +53,6 @@ namespace EduTrack.View
             timer.Tick += Timer_Tick;
             timer.Start();
             LoadClasses();
-
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -80,9 +70,7 @@ namespace EduTrack.View
         {
             try
             {
-                string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     connection.Open();
 
@@ -137,7 +125,7 @@ namespace EduTrack.View
                             MySqlCommand commandId = new MySqlCommand(query, connection);
                             int studentId = Convert.ToInt32(commandId.ExecuteScalar());
 
-                            SaveStudent(studentId);
+                            SaveStudent(studentId, connection);
 
                             MessageBox.Show("Student information saved successfully!");
                         }
@@ -147,34 +135,36 @@ namespace EduTrack.View
                         }
                     }
                 }
-                connection.Close();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("An error occurred: " + ex.Message);
             }
         }
-        private void SaveStudent(int studentId)
-        {
-            string className = comboBoxClass.SelectedItem.ToString();
-            string query = "SELECT ClassID FROM classes WHERE ClassName = @ClassName";
-            MySqlCommand command = new MySqlCommand(query, connection);
-            command.Parameters.AddWithValue("@ClassName", className);
-            int classId = Convert.ToInt32(command.ExecuteScalar());
 
-            query = "INSERT INTO studentclasses (StudentID, ClassID) VALUES (@StudentID, @ClassID)";
-            command = new MySqlCommand(query, connection);
-            command.Parameters.AddWithValue("@StudentID", studentId);
-            command.Parameters.AddWithValue("@ClassID", classId);
-            command.ExecuteNonQuery();
+        private void SaveStudent(int studentId, MySqlConnection connection)
+        {
+            if (comboBoxClass.SelectedItem != null)
+            {
+                string className = comboBoxClass.SelectedItem.ToString();
+                string query = "SELECT ClassID FROM classes WHERE ClassName = @ClassName";
+                MySqlCommand command = new MySqlCommand(query, connection);
+                command.Parameters.AddWithValue("@ClassName", className);
+                int classId = Convert.ToInt32(command.ExecuteScalar());
+
+                query = "INSERT INTO studentclasses (StudentID, ClassID) VALUES (@StudentID, @ClassID)";
+                command = new MySqlCommand(query, connection);
+                command.Parameters.AddWithValue("@StudentID", studentId);
+                command.Parameters.AddWithValue("@ClassID", classId);
+                command.ExecuteNonQuery();
+            }
         }
+
         private void LoadClasses()
         {
             classes = new ObservableCollection<string>();
 
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
             {
                 connection.Open();
 
@@ -191,6 +181,7 @@ namespace EduTrack.View
             }
             comboBoxClass.ItemsSource = classes;
         }
+
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();

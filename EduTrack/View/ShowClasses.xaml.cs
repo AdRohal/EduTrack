@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using EduTrack.Data;
 
 namespace EduTrack.View
 {
@@ -23,10 +24,6 @@ namespace EduTrack.View
     /// </summary>
     public partial class ShowClasses : UserControl
     {
-        private const string DatabaseServer = "127.0.0.1";
-        private const string DatabaseName = "datebase";
-        private const string DatabaseUser = "root";
-        private const string DatabasePassword = "";
         public ShowClasses()
         {
             InitializeComponent();
@@ -36,7 +33,6 @@ namespace EduTrack.View
 
         private async Task LoadStudentsAsync(string className = null, string searchText = null)
         {
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
             string query = "SELECT s.StudentID, s.p_pic, s.f_name, s.m_name, s.l_name, s.gender, s.email, s.phone, s.b_date, s.nationality, s.cin, s.j_date, s.Major " +
                            "FROM student_registry s " +
                            "JOIN studentclasses sc ON s.StudentID = sc.StudentID " +
@@ -54,7 +50,7 @@ namespace EduTrack.View
 
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
                     using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -95,14 +91,13 @@ namespace EduTrack.View
         }
         private async void LoadClasses()
         {
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
             string query = "SELECT ClassName FROM classes";
 
             List<string> classNames = new List<string>();
 
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
                     using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -128,14 +123,13 @@ namespace EduTrack.View
         }
         private async void LoadTeachersOrStudents(string type)
         {
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
             string query = type == "Teacher" ? "SELECT f_name, m_name, l_name FROM teacher_registry" : "SELECT f_name, m_name, l_name FROM student_registry";
 
             List<string> names = new List<string>();
 
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
                     using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -207,7 +201,6 @@ namespace EduTrack.View
 
         private async void AddTeacherOrStudent_Click(object sender, RoutedEventArgs e)
         {
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
             string selectedClass = comboBoxClass.SelectedItem as string;
             string selectedTeacherOrStudent = comboBoxTeacherStudent.SelectedItem as string;
 
@@ -228,7 +221,7 @@ namespace EduTrack.View
 
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
                     using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -284,7 +277,6 @@ namespace EduTrack.View
 
         private async void comboBoxClass_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
             string selectedClass = comboBoxClass.SelectedItem as string;
             if (!string.IsNullOrEmpty(selectedClass))
             {
@@ -296,7 +288,7 @@ namespace EduTrack.View
 
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
 
@@ -358,7 +350,6 @@ namespace EduTrack.View
 
         private async void deleteButton_Click(object sender, RoutedEventArgs e)
         {
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
             string selectedClass = comboBoxClass.SelectedItem as string;
 
             if (string.IsNullOrEmpty(selectedClass))
@@ -373,7 +364,7 @@ namespace EduTrack.View
 
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
                     using (MySqlCommand commandDeleteStudentClasses = new MySqlCommand(queryDeleteStudentClasses, connection))
