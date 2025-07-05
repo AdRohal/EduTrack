@@ -1,29 +1,34 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Windows;
+using EduTrack.Data;
 
 namespace EduTrack
 {
     public partial class SignUpPage : Window
     {
-        private const string DatabaseServer = "127.0.0.1";
-        private const string DatabaseName = "datebase";
-        private const string DatabaseUser = "root";
-        private const string DatabasePassword = "";
-
-        private readonly MySqlConnection connection;
-
         public SignUpPage()
         {
             InitializeComponent();
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-            connection = new MySqlConnection(connectionString);
         }
 
         private void SignUpBtn_Click_1(object sender, RoutedEventArgs e)
         {
+            // Test database connection first
+            if (!DatabaseConnectionManager.TestConnection(out string errorMessage))
+            {
+                MessageBox.Show($"Database connection failed: {errorMessage}", "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             string username = UserName.Text;
             string password = Password.Password;
+
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            {
+                MessageBox.Show("Please enter both username and password.", "Input Required", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
             if (CreateUser(username, password))
             {
@@ -42,13 +47,16 @@ namespace EduTrack
             {
                 string query = "INSERT INTO Login (UserName, Password) VALUES (@UserName, @Password)";
 
-                using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                using (var connection = DatabaseConnectionManager.CreateConnection())
                 {
-                    cmd.Parameters.AddWithValue("@UserName", username);
-                    cmd.Parameters.AddWithValue("@Password", password);
+                    using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@UserName", username);
+                        cmd.Parameters.AddWithValue("@Password", password);
 
-                    connection.Open();
-                    cmd.ExecuteNonQuery();
+                        connection.Open();
+                        cmd.ExecuteNonQuery();
+                    }
                 }
 
                 return true;
@@ -62,10 +70,6 @@ namespace EduTrack
             {
                 MessageBox.Show($"Error creating user: {ex.Message}");
                 return false;
-            }
-            finally
-            {
-                connection.Close();
             }
         }
 

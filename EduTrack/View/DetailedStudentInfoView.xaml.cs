@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using EduTrack.Data;
 
 namespace EduTrack.View
 {
@@ -24,13 +25,6 @@ namespace EduTrack.View
     /// </summary>
     public partial class DetailedStudentInfoView : Window
     {
-        private const string DatabaseServer = "127.0.0.1";
-        private const string DatabaseName = "datebase";
-        private const string DatabaseUser = "root";
-        private const string DatabasePassword = "";
-
-        private readonly MySqlConnection connection;
-
         private string uploadedFileName;
         private string uploadedFileName1;
         private string uploadedFileName2;
@@ -50,9 +44,6 @@ namespace EduTrack.View
             this.MaxWidth = 1174;
             this.MaxHeight = 679;
             this.SizeToContent = SizeToContent.Manual;
-
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-            connection = new MySqlConnection(connectionString);
 
             DoubleAnimation fadeInAnimation = new DoubleAnimation
             {
@@ -89,26 +80,25 @@ namespace EduTrack.View
             MessageBoxResult result = MessageBox.Show("Are you sure you want to delete this student?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result == MessageBoxResult.Yes)
             {
-                connection.Open();
+                using (var connection = DatabaseConnectionManager.CreateConnection())
+                {
+                    connection.Open();
 
-                MySqlCommand command = new MySqlCommand($"DELETE FROM student_registry WHERE StudentID = @StudentID", connection);
+                    MySqlCommand command = new MySqlCommand($"DELETE FROM student_registry WHERE StudentID = @StudentID", connection);
 
-                command.Parameters.AddWithValue("@StudentID", studentId);
+                    command.Parameters.AddWithValue("@StudentID", studentId);
 
-                command.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
 
-                connection.Close();
-
-                MessageBox.Show("Student has been deleted successfully.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Student has been deleted successfully.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
             }
         }
         private void LoadClasses()
         {
             classes = new ObservableCollection<string>();
 
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            using (var connection = DatabaseConnectionManager.CreateConnection())
             {
                 connection.Open();
 
@@ -127,40 +117,39 @@ namespace EduTrack.View
         }
         private void LoadStudentClass()
         {
-            connection.Open();
-
-            string query = "SELECT ClassID FROM studentclasses WHERE StudentID = @StudentID";
-
-            MySqlCommand command = new MySqlCommand(query, connection);
-            command.Parameters.AddWithValue("@StudentID", studentId);
-            object result = command.ExecuteScalar();
-            if (result == null)
+            using (var connection = DatabaseConnectionManager.CreateConnection())
             {
-                comboBoxClass.SelectedItem = null;
+                connection.Open();
+
+                string query = "SELECT ClassID FROM studentclasses WHERE StudentID = @StudentID";
+
+                MySqlCommand command = new MySqlCommand(query, connection);
+                command.Parameters.AddWithValue("@StudentID", studentId);
+                object result = command.ExecuteScalar();
+                if (result == null)
+                {
+                    comboBoxClass.SelectedItem = null;
+                }
+                else
+                {
+                    int classId = Convert.ToInt32(result);
+
+                    query = "SELECT ClassName FROM classes WHERE ClassID = @ClassID";
+
+                    command = new MySqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@ClassID", classId);
+                    string className = command.ExecuteScalar()?.ToString();
+
+                    comboBoxClass.SelectedItem = className;
+                }
             }
-            else
-            {
-                int classId = Convert.ToInt32(result);
-
-                query = "SELECT ClassName FROM classes WHERE ClassID = @ClassID";
-
-                command = new MySqlCommand(query, connection);
-                command.Parameters.AddWithValue("@ClassID", classId);
-                string className = command.ExecuteScalar()?.ToString();
-
-                comboBoxClass.SelectedItem = className;
-            }
-
-            connection.Close();
         }
 
         private void UpdateStudent()
         {
             try
             {
-                string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (var connection = DatabaseConnectionManager.CreateConnection())
                 {
                     connection.Open();
 
@@ -242,33 +231,34 @@ namespace EduTrack.View
             }
             try
             {
-                connection.Open();
-
-                string query = "SELECT ClassID FROM classes WHERE ClassName = @ClassName";
-                MySqlCommand command = new MySqlCommand(query, connection);
-                command.Parameters.AddWithValue("@ClassName", className);
-                int classId = Convert.ToInt32(command.ExecuteScalar());
-
-                query = "SELECT COUNT(*) FROM studentclasses WHERE StudentID = @StudentID";
-                command = new MySqlCommand(query, connection);
-                command.Parameters.AddWithValue("@StudentID", studentId);
-                int count = Convert.ToInt32(command.ExecuteScalar());
-
-                if (count > 0)
+                using (var connection = DatabaseConnectionManager.CreateConnection())
                 {
-                    query = "UPDATE studentclasses SET ClassID = @ClassID WHERE StudentID = @StudentID";
-                }
-                else
-                {
-                    query = "INSERT INTO studentclasses (StudentID, ClassID) VALUES (@StudentID, @ClassID)";
-                }
+                    connection.Open();
 
-                command = new MySqlCommand(query, connection);
-                command.Parameters.AddWithValue("@StudentID", studentId);
-                command.Parameters.AddWithValue("@ClassID", classId);
-                int rowsAffected = command.ExecuteNonQuery();
+                    string query = "SELECT ClassID FROM classes WHERE ClassName = @ClassName";
+                    MySqlCommand command = new MySqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@ClassName", className);
+                    int classId = Convert.ToInt32(command.ExecuteScalar());
 
-                connection.Close();
+                    query = "SELECT COUNT(*) FROM studentclasses WHERE StudentID = @StudentID";
+                    command = new MySqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@StudentID", studentId);
+                    int count = Convert.ToInt32(command.ExecuteScalar());
+
+                    if (count > 0)
+                    {
+                        query = "UPDATE studentclasses SET ClassID = @ClassID WHERE StudentID = @StudentID";
+                    }
+                    else
+                    {
+                        query = "INSERT INTO studentclasses (StudentID, ClassID) VALUES (@StudentID, @ClassID)";
+                    }
+
+                    command = new MySqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@StudentID", studentId);
+                    command.Parameters.AddWithValue("@ClassID", classId);
+                    int rowsAffected = command.ExecuteNonQuery();
+                }
             }
             catch (Exception ex)
             {
@@ -404,9 +394,7 @@ namespace EduTrack.View
         {
             try
             {
-                string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (var connection = DatabaseConnectionManager.CreateConnection())
                 {
                     connection.Open();
 

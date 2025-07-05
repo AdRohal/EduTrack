@@ -9,16 +9,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using EduTrack.Data;
 
 namespace EduTrack.View
 {
     public partial class ClassesSchedule : UserControl
     {
-        private const string DatabaseServer = "127.0.0.1";
-        private const string DatabaseName = "datebase";
-        private const string DatabaseUser = "root";
-        private const string DatabasePassword = "";
-
         public ClassesSchedule()
         {
             InitializeComponent();
@@ -54,14 +50,13 @@ namespace EduTrack.View
 
         private async void LoadClasses()
         {
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
             string query = "SELECT ClassName FROM classes";
 
             List<string> classNames = new List<string>();
 
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
                     using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -88,7 +83,6 @@ namespace EduTrack.View
 
         private async Task LoadScheduleForClass(string className)
         {
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
             // Initialize a list to hold the complete schedule, including all time slots.
             List<ScheduleSlot> completeSchedule = new List<ScheduleSlot>();
             // First, populate this list with all time slots, leaving class-specific details empty for now.
@@ -101,7 +95,7 @@ namespace EduTrack.View
 
             try
             {
-                using (var connection = new MySqlConnection(connectionString))
+                using (var connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
                     using (var command = new MySqlCommand(query, connection))
@@ -141,11 +135,10 @@ namespace EduTrack.View
 
         private async Task InsertDataIntoDatabase(ScheduleSlot scheduleSlot, int classId)
         {
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
             string query = @"INSERT INTO classschedules (ClassID, TimeSlot, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) 
                      VALUES (@ClassID, @TimeSlot, @Monday, @Tuesday, @Wednesday, @Thursday, @Friday, @Saturday, @Sunday)";
 
-            using (var connection = new MySqlConnection(connectionString))
+            using (var connection = DatabaseConnectionManager.CreateConnection())
             {
                 await connection.OpenAsync();
                 using (var command = new MySqlCommand(query, connection))
@@ -249,12 +242,11 @@ namespace EduTrack.View
 
         private async Task<int> GetClassIdByName(string className)
         {
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
             string query = "SELECT ClassID FROM classes WHERE ClassName = @ClassName LIMIT 1";
 
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
                     using (MySqlCommand command = new MySqlCommand(query, connection))

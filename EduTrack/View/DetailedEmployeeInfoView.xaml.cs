@@ -17,6 +17,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using EduTrack.Data;
 
 namespace EduTrack.View
 {
@@ -25,20 +26,13 @@ namespace EduTrack.View
     /// </summary>
     public partial class DetailedEmployeeInfoView : Window
     {
-        private const string DatabaseServer = "127.0.0.1";
-        private const string DatabaseName = "datebase";
-        private const string DatabaseUser = "root";
-        private const string DatabasePassword = "";
-
-        private readonly MySqlConnection connection;
-
         private string uploadedFileName;
         private string uploadedFileName1;
         private string uploadedFileName2;
         private string uploadedFileName3;
         private string uploadedFileName4;
         private string uploadedFileName5;
-        private readonly int  employeeId;
+        private readonly int employeeId;
 
         public DetailedEmployeeInfoView(Employee selectedEmployee)
         {
@@ -51,9 +45,6 @@ namespace EduTrack.View
             this.MaxHeight = 679;
 
             this.SizeToContent = SizeToContent.Manual;
-
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-            connection = new MySqlConnection(connectionString);
 
             DoubleAnimation fadeInAnimation = new DoubleAnimation
             {
@@ -101,17 +92,18 @@ namespace EduTrack.View
             MessageBoxResult result = MessageBox.Show("Are you sure you want to delete this employee?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result == MessageBoxResult.Yes)
             {
-                connection.Open();
+                using (var connection = DatabaseConnectionManager.CreateConnection())
+                {
+                    connection.Open();
 
-                MySqlCommand command = new MySqlCommand($"DELETE FROM employee_registry WHERE Id = @Id", connection);
+                    MySqlCommand command = new MySqlCommand($"DELETE FROM employee_registry WHERE Id = @Id", connection);
 
-                command.Parameters.AddWithValue("@Id", employeeId);
+                    command.Parameters.AddWithValue("@Id", employeeId);
 
-                command.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
 
-                connection.Close();
-
-                MessageBox.Show("Employee has been deleted successfully.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Employee has been deleted successfully.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
             }
         }
 
@@ -121,9 +113,7 @@ namespace EduTrack.View
         {
             try
             {
-                string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (var connection = DatabaseConnectionManager.CreateConnection())
                 {
                     connection.Open();
 
@@ -267,7 +257,7 @@ namespace EduTrack.View
 
         private void ViewDocument_Click(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(uploadedFileName))
+            if (!string.IsNullOrEmpty(uploadedFileName1))
             {
                 DocumentViewerWindow documentViewer = new DocumentViewerWindow(uploadedFileName1);
                 documentViewer.ShowDialog();
@@ -418,9 +408,7 @@ namespace EduTrack.View
         {
             try
             {
-                string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (var connection = DatabaseConnectionManager.CreateConnection())
                 {
                     connection.Open();
 

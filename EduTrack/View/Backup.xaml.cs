@@ -9,6 +9,7 @@ using MySql.Data.MySqlClient;
 using Microsoft.Win32;
 using System.Linq;
 using System.Collections.Generic;
+using EduTrack.Data;
 
 namespace EduTrack.View
 {
@@ -17,19 +18,11 @@ namespace EduTrack.View
     /// </summary>
     public partial class Backup : UserControl
     {
-        private const string DatabaseServer = "127.0.0.1";
-        private const string DatabaseName = "datebase";
-        private const string DatabaseUser = "root";
-        private const string DatabasePassword = "";
         private string filePath;
-
-        private readonly MySqlConnection connection;
 
         public Backup()
         {
             InitializeComponent();
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
-            connection = new MySqlConnection(connectionString);
         }
 
         private void downloadButton_Click(object sender, RoutedEventArgs e)
@@ -55,9 +48,8 @@ namespace EduTrack.View
         private void DownloadTeacherData()
         {
             string query = "SELECT * FROM teacher_registry";
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
 
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
             {
                 try
                 {
@@ -113,9 +105,8 @@ namespace EduTrack.View
         private void DownloadEmployeeData()
         {
             string query = "SELECT * FROM employee_registry";
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
 
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
             {
                 try
                 {
@@ -151,7 +142,7 @@ namespace EduTrack.View
                                         value = date.ToString("yyyy-MM-dd");
                                     }
                                 }
-                                outputFile.WriteLine($"\t\t<{column.ColumnName}>{row[column]}</{column.ColumnName}>");
+                                outputFile.WriteLine($"\t\t<{column.ColumnName}>{value}</{column.ColumnName}>");
                             }
                             outputFile.WriteLine("\t</Employee>");
                         }
@@ -171,9 +162,8 @@ namespace EduTrack.View
         private void DownloadStudentData()
         {
             string query = "SELECT * FROM student_registry";
-            string connectionString = $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
 
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
             {
                 try
                 {
@@ -209,7 +199,7 @@ namespace EduTrack.View
                                         value = date.ToString("yyyy-MM-dd");
                                     }
                                 }
-                                outputFile.WriteLine($"\t\t<{column.ColumnName}>{row[column]}</{column.ColumnName}>");
+                                outputFile.WriteLine($"\t\t<{column.ColumnName}>{value}</{column.ColumnName}>");
                             }
                             outputFile.WriteLine("\t</Student>");
                         }
@@ -248,45 +238,48 @@ namespace EduTrack.View
             DataSet ds = new DataSet();
             ds.ReadXml(filePath);
 
-            try
+            using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
             {
-                connection.Open();
-
-                DataTable dt = ds.Tables[0];
-                foreach (DataRow row in dt.Rows)
+                try
                 {
-                    var values = new List<string>();
-                    foreach (var item in row.ItemArray)
+                    connection.Open();
+
+                    DataTable dt = ds.Tables[0];
+                    foreach (DataRow row in dt.Rows)
                     {
-                        string value;
-                        if (item is DBNull)
+                        var values = new List<string>();
+                        foreach (var item in row.ItemArray)
                         {
-                            value = "NULL";
+                            string value;
+                            if (item is DBNull)
+                            {
+                                value = "NULL";
+                            }
+                            else
+                            {
+                                value = item.ToString().Replace("'", "''");
+                                value = value.Replace("\\", "\\\\");
+                                value = $"'{value}'";
+                            }
+                            values.Add(value);
                         }
-                        else
-                        {
-                            value = item.ToString().Replace("'", "''");
-                            value = value.Replace("\\", "\\\\");
-                            value = $"'{value}'";
-                        }
-                        values.Add(value);
-                    }
 
-                    string query = $"INSERT INTO {tableName} ({string.Join(", ", dt.Columns.Cast<DataColumn>().Select(c => $"`{c.ColumnName}`"))}) VALUES ({string.Join(", ", values)})";
-                    MySqlCommand command = new MySqlCommand(query, connection);
-                    command.ExecuteNonQuery();
+                        string query = $"INSERT INTO {tableName} ({string.Join(", ", dt.Columns.Cast<DataColumn>().Select(c => $"`{c.ColumnName}`"))}) VALUES ({string.Join(", ", values)})";
+                        MySqlCommand command = new MySqlCommand(query, connection);
+                        command.ExecuteNonQuery();
+                    }
+                    MessageBox.Show("Data has been imported successfully.");
                 }
-                MessageBox.Show("Data has been imported successfully.");
-            }
-            catch (MySqlException ex)
-            {
-                MessageBox.Show("An error occurred while connecting to the database: " + ex.Message);
-            }
-            finally
-            {
-                if (connection.State == ConnectionState.Open)
+                catch (MySqlException ex)
                 {
-                    connection.Close();
+                    MessageBox.Show("An error occurred while connecting to the database: " + ex.Message);
+                }
+                finally
+                {
+                    if (connection.State == ConnectionState.Open)
+                    {
+                        connection.Close();
+                    }
                 }
             }
         }

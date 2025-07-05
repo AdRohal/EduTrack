@@ -10,13 +10,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using EduTrack.Data;
 
 namespace EduTrack.View
 {
     public partial class ClassesGrades : UserControl
     {
-        private string connectionString = $"Server=127.0.0.1;Database=datebase;User ID=root;Password=;";
-
         public ClassesGrades()
         {
             InitializeComponent();
@@ -35,7 +34,7 @@ namespace EduTrack.View
 
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (var connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
                     using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -82,7 +81,7 @@ namespace EduTrack.View
 
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
                     using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -144,7 +143,7 @@ WHERE sc.ClassID = @ClassID";
 
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
                     using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -190,7 +189,7 @@ ORDER BY FullName";
 
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
                     using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -235,7 +234,7 @@ ORDER BY FullName";
                 var moduleName = moduleNameTextBox.Text.Trim();
                 try
                 {
-                    using (MySqlConnection connection = new MySqlConnection(connectionString))
+                    using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                     {
                         await connection.OpenAsync();
                         string query = "INSERT INTO modules (ModuleName, ClassID) VALUES (@ModuleName, @ClassID)";
@@ -271,49 +270,49 @@ ORDER BY FullName";
         }
 
         private async void SaveGradeButton_Click(object sender, RoutedEventArgs e)
-{
-    if (ModuleComboBox.SelectedValue is int selectedModuleId)
-    {
-        foreach (var item in studentsDataGrid.Items)
         {
-            // Check if the item is of type Student before casting
-            if (item is Student student)
+            if (ModuleComboBox.SelectedValue is int selectedModuleId)
             {
-                string grade = student.Grade; // Grade comes directly from the DataGrid binding
+                foreach (var item in studentsDataGrid.Items)
+                {
+                    // Check if the item is of type Student before casting
+                    if (item is Student student)
+                    {
+                        string grade = student.Grade; // Grade comes directly from the DataGrid binding
 
-                string query = @"
+                        string query = @"
 INSERT INTO student_module (StudentID, ModuleID, Grade)
 VALUES (@StudentID, @ModuleID, @Grade)
 ON DUPLICATE KEY UPDATE Grade = @Grade";
 
-                try
-                {
-                    using (MySqlConnection connection = new MySqlConnection(connectionString))
-                    {
-                        await connection.OpenAsync();
-                        using (MySqlCommand command = new MySqlCommand(query, connection))
+                        try
                         {
-                            command.Parameters.AddWithValue("@StudentID", student.StudentID);
-                            command.Parameters.AddWithValue("@ModuleID", selectedModuleId);
-                            command.Parameters.AddWithValue("@Grade", grade);
+                            using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
+                            {
+                                await connection.OpenAsync();
+                                using (MySqlCommand command = new MySqlCommand(query, connection))
+                                {
+                                    command.Parameters.AddWithValue("@StudentID", student.StudentID);
+                                    command.Parameters.AddWithValue("@ModuleID", selectedModuleId);
+                                    command.Parameters.AddWithValue("@Grade", grade);
 
-                            await command.ExecuteNonQueryAsync();
+                                    await command.ExecuteNonQueryAsync();
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                MessageBox.Show("Grades saved successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("Please select a module.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
-        MessageBox.Show("Grades saved successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-    }
-    else
-    {
-        MessageBox.Show("Please select a module.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-    }
-}
 
 
 
@@ -328,7 +327,7 @@ ON DUPLICATE KEY UPDATE Grade = @Grade";
             return new ModuleDetails
             {
                 ModuleName = "Example Module",
-                ClassID = 1 
+                ClassID = 1
             };
         }
 
