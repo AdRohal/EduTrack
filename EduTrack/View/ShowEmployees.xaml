@@ -11,7 +11,7 @@
             <TextBox x:Name="SearchBox" BorderThickness="0" Padding="5" TextChanged="SearchBox_TextChanged" Margin="10,4,10,2" Background="#272B2F" Foreground="White"/>
         </Border>
         <Button Style="{StaticResource RefreshButtonStyle}" Click="Refresh_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="775,20,0,0" Height="23" Width="22"/>
-        <Label Content="List Of Students :" HorizontalAlignment="Left" Margin="10,2,0,0" VerticalAlignment="Top" FontSize="28" Foreground="White"/>
+        <Label Content="List Of Employee :" HorizontalAlignment="Left" Margin="10,2,0,0" VerticalAlignment="Top" FontSize="28" Foreground="White"/>
         <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,66,0,50" PanningMode="VerticalFirst" MouseEnter="ScrollViewer_MouseEnter" PreviewMouseWheel="ListBox_PreviewMouseWheel">
             <ListBox x:Name="EmployeesList" Background="#212529" BorderBrush="{x:Null}">
                 <ListBox.ItemsPanel>

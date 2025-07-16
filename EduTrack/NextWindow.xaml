@@ -173,8 +173,7 @@
                     <ColumnDefinition Width="53*"/>
                     <ColumnDefinition Width="37*"/>
                 </Grid.ColumnDefinitions>
-                <Image Source="Image/Logo.png" Stretch="Fill" Margin="147,-306,-279,59" Grid.Column="1"/>
-
+                <Image Source="Image/Logo.png" Stretch="Fill" Margin="147,-306,-279,28" Grid.Column="1"/>
             </Grid>
         </StackPanel>
     </Border>
