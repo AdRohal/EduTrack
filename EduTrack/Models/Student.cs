@@ -17,6 +17,7 @@ namespace EduTrack.Models
         {
             get { return $"{F_Name} {L_Name}"; }
         }
+        public string Initials => NameHelper.Initials(F_Name, L_Name);
         public string Gender { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }

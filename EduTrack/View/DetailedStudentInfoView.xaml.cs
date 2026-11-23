@@ -1,4 +1,4 @@
-﻿using EduTrack.Models;
+using EduTrack.Models;
 using Microsoft.Win32;
 using MySql.Data.MySqlClient;
 using System;
@@ -17,14 +17,22 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using EduTrack.Data;
+using EduTrack.Utilities;
 
 namespace EduTrack.View
 {
     /// <summary>
     /// Interaction logic for DetailedStudentInfoView.xaml
     /// </summary>
-    public partial class DetailedStudentInfoView : Window
+    public partial class DetailedStudentInfoView : UserControl
     {
+        /// <summary>Raised when the user goes back to the list, or after the record is deleted.</summary>
+        public event EventHandler Closed;
+
+        private void OnClosed() => Closed?.Invoke(this, EventArgs.Empty);
+
+        private void Back_Click(object sender, RoutedEventArgs e) => OnClosed();
+
         private string uploadedFileName;
         private string uploadedFileName1;
         private string uploadedFileName2;
@@ -39,24 +47,7 @@ namespace EduTrack.View
         {
             InitializeComponent();
 
-            this.Width = 1174;
-            this.Height = 679;
-            this.MaxWidth = 1174;
-            this.MaxHeight = 679;
-            this.SizeToContent = SizeToContent.Manual;
 
-            DoubleAnimation fadeInAnimation = new DoubleAnimation
-            {
-                From = 0,
-                To = 1,
-                Duration = TimeSpan.FromSeconds(1)
-            };
-            ReminderMessage.BeginAnimation(TextBlock.OpacityProperty, fadeInAnimation);
-
-            System.Windows.Threading.DispatcherTimer timer = new System.Windows.Threading.DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(5);
-            timer.Tick += Timer_Tick;
-            timer.Start();
 
             studentId = selectedStudent.Id;
             LoadStudentData(studentId);
@@ -64,16 +55,6 @@ namespace EduTrack.View
             LoadStudentClass();
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            DoubleAnimation fadeOutAnimation = new DoubleAnimation
-            {
-                From = 1,
-                To = 0,
-                Duration = TimeSpan.FromSeconds(1)
-            };
-            ReminderMessage.BeginAnimation(TextBlock.OpacityProperty, fadeOutAnimation);
-        }
 
         private void Button_Click2(object sender, RoutedEventArgs e)
         {
@@ -84,13 +65,14 @@ namespace EduTrack.View
                 {
                     connection.Open();
 
-                    MySqlCommand command = new MySqlCommand($"DELETE FROM student_registry WHERE StudentID = @StudentID", connection);
+                    MySqlCommand command = new MySqlCommand("DELETE FROM studentclasses WHERE StudentID = @StudentID; DELETE FROM student_registry WHERE StudentID = @StudentID", connection);
 
                     command.Parameters.AddWithValue("@StudentID", studentId);
 
                     command.ExecuteNonQuery();
 
                     MessageBox.Show("Student has been deleted successfully.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    OnClosed();
                 }
             }
         }
@@ -176,7 +158,7 @@ namespace EduTrack.View
                         command.Parameters.AddWithValue("@gender", comboBoxGender.SelectedItem == null ? "" : comboBoxGender.SelectedItem.ToString());
                         command.Parameters.AddWithValue("@email", txtEmail.Text);
                         command.Parameters.AddWithValue("@phone", txtPhone.Text);
-                        command.Parameters.AddWithValue("@b_date", datePickerBirthDate.SelectedDate.GetValueOrDefault());
+                        command.Parameters.AddWithValue("@b_date", (object)datePickerBirthDate.SelectedDate ?? DBNull.Value);
                         command.Parameters.AddWithValue("@nationality", comboBoxNationality.SelectedItem == null ? "" : comboBoxNationality.SelectedItem.ToString());
                         command.Parameters.AddWithValue("@cin", txtCin.Text);
                         command.Parameters.AddWithValue("@address", txtAddress.Text);
@@ -184,7 +166,7 @@ namespace EduTrack.View
                         command.Parameters.AddWithValue("@cin_back_copy", uploadedFileName2);
                         command.Parameters.AddWithValue("@school_name", txtOrganization.Text);
                         command.Parameters.AddWithValue("@major", txtModule.Text);
-                        command.Parameters.AddWithValue("@j_date", Date_appointment.SelectedDate.GetValueOrDefault());
+                        command.Parameters.AddWithValue("@j_date", (object)Date_appointment.SelectedDate ?? DBNull.Value);
                         command.Parameters.AddWithValue("@high_degree", txtHighestDegree.Text);
                         command.Parameters.AddWithValue("@year_graduation", string.IsNullOrEmpty(txtYearGraduation.Text) ? 0 : int.Parse(txtYearGraduation.Text));
                         command.Parameters.AddWithValue("@university", txtUniversity.Text);
@@ -222,6 +204,8 @@ namespace EduTrack.View
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            if (!FormValidation.Validate(this, txtFirstName, txtLastName, txtEmail)) return;
+
             UpdateStudent();
             string className = comboBoxClass.SelectedItem?.ToString();
             if (className == null)
@@ -276,7 +260,7 @@ namespace EduTrack.View
             {
                 uploadedFileName = openFileDialog.FileName;
 
-                uploadedImage.Source = new BitmapImage(new Uri(uploadedFileName));
+                FormHelper.ShowPhoto(uploadedImage, uploadedFileName);
             }
         }
 
@@ -287,7 +271,7 @@ namespace EduTrack.View
             {
                 uploadedFileName1 = openFileDialog.FileName;
 
-                FileNameLabel.Content = System.IO.Path.GetFileName(uploadedFileName1);
+                FormHelper.ShowDoc(FileNameLabel, ViewButton, uploadedFileName1);
 
                 ViewButton.Visibility = Visibility.Visible;
             }
@@ -300,7 +284,7 @@ namespace EduTrack.View
             {
                 uploadedFileName2 = openFileDialog.FileName;
 
-                FileNameLabel2.Content = System.IO.Path.GetFileName(uploadedFileName2);
+                FormHelper.ShowDoc(FileNameLabel2, ViewButton2, uploadedFileName2);
 
                 ViewButton2.Visibility = Visibility.Visible;
             }
@@ -313,7 +297,7 @@ namespace EduTrack.View
             {
                 uploadedFileName3 = openFileDialog.FileName;
 
-                FileNameLabel3.Content = System.IO.Path.GetFileName(uploadedFileName3);
+                FormHelper.ShowDoc(FileNameLabel3, ViewButton3, uploadedFileName3);
 
                 ViewButton3.Visibility = Visibility.Visible;
             }
@@ -326,7 +310,7 @@ namespace EduTrack.View
             {
                 uploadedFileName4 = openFileDialog.FileName;
 
-                FileNameLabel4.Content = System.IO.Path.GetFileName(uploadedFileName4);
+                FormHelper.ShowDoc(FileNameLabel4, ViewButton4, uploadedFileName4);
 
                 ViewButton4.Visibility = Visibility.Visible;
             }
@@ -339,7 +323,7 @@ namespace EduTrack.View
             {
                 uploadedFileName5 = openFileDialog.FileName;
 
-                FileNameLabel5.Content = System.IO.Path.GetFileName(uploadedFileName5);
+                FormHelper.ShowDoc(FileNameLabel5, ViewButton5, uploadedFileName5);
 
                 ViewButton5.Visibility = Visibility.Visible;
             }
@@ -349,8 +333,7 @@ namespace EduTrack.View
         {
             if (!string.IsNullOrEmpty(uploadedFileName1))
             {
-                DocumentViewerWindow documentViewer = new DocumentViewerWindow(uploadedFileName1);
-                documentViewer.ShowDialog();
+                DocumentViewerOverlay.Show(uploadedFileName1);
             }
         }
 
@@ -358,8 +341,7 @@ namespace EduTrack.View
         {
             if (!string.IsNullOrEmpty(uploadedFileName2))
             {
-                DocumentViewerWindow documentViewer = new DocumentViewerWindow(uploadedFileName2);
-                documentViewer.ShowDialog();
+                DocumentViewerOverlay.Show(uploadedFileName2);
             }
         }
 
@@ -367,8 +349,7 @@ namespace EduTrack.View
         {
             if (!string.IsNullOrEmpty(uploadedFileName3))
             {
-                DocumentViewerWindow documentViewer = new DocumentViewerWindow(uploadedFileName3);
-                documentViewer.ShowDialog();
+                DocumentViewerOverlay.Show(uploadedFileName3);
             }
         }
 
@@ -376,8 +357,7 @@ namespace EduTrack.View
         {
             if (!string.IsNullOrEmpty(uploadedFileName4))
             {
-                DocumentViewerWindow documentViewer = new DocumentViewerWindow(uploadedFileName4);
-                documentViewer.ShowDialog();
+                DocumentViewerOverlay.Show(uploadedFileName4);
             }
         }
 
@@ -385,8 +365,7 @@ namespace EduTrack.View
         {
             if (!string.IsNullOrEmpty(uploadedFileName5))
             {
-                DocumentViewerWindow documentViewer = new DocumentViewerWindow(uploadedFileName5);
-                documentViewer.ShowDialog();
+                DocumentViewerOverlay.Show(uploadedFileName5);
             }
         }
 
@@ -412,14 +391,14 @@ namespace EduTrack.View
                             while (reader.Read())
                             {
                                 uploadedFileName = reader["p_pic"].ToString();
-                                uploadedImage.Source = new BitmapImage(new Uri(uploadedFileName));
+                                FormHelper.ShowPhoto(uploadedImage, uploadedFileName);
                                 txtFirstName.Text = reader["f_name"].ToString();
                                 txtMiddleName.Text = reader["m_name"].ToString();
                                 txtLastName.Text = reader["l_name"].ToString();
                                 comboBoxGender.SelectedItem = reader["gender"].ToString();
                                 txtEmail.Text = reader["email"].ToString();
                                 txtPhone.Text = reader["phone"].ToString();
-                                datePickerBirthDate.SelectedDate = Convert.ToDateTime(reader["b_date"]);
+                                datePickerBirthDate.SelectedDate = (reader["b_date"] as DateTime?);
                                 comboBoxNationality.SelectedItem = reader["nationality"].ToString();
                                 txtCin.Text = reader["cin"].ToString();
                                 txtAddress.Text = reader["address"].ToString();
@@ -427,7 +406,7 @@ namespace EduTrack.View
                                 uploadedFileName2 = reader["cin_back_copy"].ToString();
                                 txtOrganization.Text = reader["school_name"].ToString();
                                 txtModule.Text = reader["major"].ToString();
-                                Date_appointment.SelectedDate = Convert.ToDateTime(reader["j_date"]);
+                                Date_appointment.SelectedDate = (reader["j_date"] as DateTime?);
                                 txtHighestDegree.Text = reader["high_degree"].ToString();
                                 txtYearGraduation.Text = reader["year_graduation"].ToString();
                                 txtUniversity.Text = reader["university"].ToString();
@@ -441,11 +420,11 @@ namespace EduTrack.View
                                 txtEmergContactCIN.Text = reader["emerg_contact_cin"].ToString();
                                 uploadedFileName3 = reader["emerg_contact_cin_f_copy"].ToString();
                                 uploadedFileName4 = reader["emerg_contact_cin_b_copy"].ToString();
-                                FileNameLabel.Content = System.IO.Path.GetFileName(uploadedFileName1);
-                                FileNameLabel2.Content = System.IO.Path.GetFileName(uploadedFileName2);
-                                FileNameLabel3.Content = System.IO.Path.GetFileName(uploadedFileName3);
-                                FileNameLabel4.Content = System.IO.Path.GetFileName(uploadedFileName4);
-                                FileNameLabel5.Content = System.IO.Path.GetFileName(uploadedFileName5);
+                                FormHelper.ShowDoc(FileNameLabel, ViewButton, uploadedFileName1);
+                                FormHelper.ShowDoc(FileNameLabel2, ViewButton2, uploadedFileName2);
+                                FormHelper.ShowDoc(FileNameLabel3, ViewButton3, uploadedFileName3);
+                                FormHelper.ShowDoc(FileNameLabel4, ViewButton4, uploadedFileName4);
+                                FormHelper.ShowDoc(FileNameLabel5, ViewButton5, uploadedFileName5);
                             }
                         }
                     }

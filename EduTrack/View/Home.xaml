@@ -1,55 +1,324 @@
-﻿<UserControl x:Class="EduTrack.View.Home"
+<UserControl x:Class="EduTrack.View.Home"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:EduTrack.View"
-             mc:Ignorable="d" Width="1348" Height="740">
-    <Grid>
-        <!-- <ScrollViewer VerticalScrollBarVisibility="Auto">-->
-        <StackPanel>
+             xmlns:u="clr-namespace:EduTrack.Utilities">
+    <UserControl.Resources>
+        <u:ShortDateConverter x:Key="ShortDate"/>
+        <u:DashIfEmptyConverter x:Key="Dash"/>
 
-            <!-- Placeholder for the video -->
-            <Border CornerRadius="20" Width="1048" Height="680" Background="#212529">
+        <!-- Clickable count tile -->
+        <Style x:Key="CountTile" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                CornerRadius="12" Padding="20,18">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource FocusBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+
+    <!-- No scrolling: the rows below share the free height and every card stretches to fill its cell -->
+    <Grid Margin="0,0,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" MinHeight="130"/>
+            <RowDefinition Height="*" MinHeight="130"/>
+        </Grid.RowDefinitions>
+
+        <!-- Greeting + shortcuts -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock x:Name="GreetingText" Style="{StaticResource DisplayText}"/>
+                <TextBlock x:Name="SubText" Text="Here is what the register holds right now." Style="{StaticResource MutedText}" Margin="0,4,0,0"/>
+            </StackPanel>
+            <StackPanel x:Name="QuickAdd" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
+                <Button Content="New class" Click="NewClass_Click" Margin="0,0,8,0"/>
+                <Button Content="New teacher" Click="NewTeacher_Click" Margin="0,0,8,0"/>
+                <Button Content="New student" Click="NewStudent_Click" Style="{StaticResource PrimaryButton}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Counts -->
+            <!-- Counts -->
+            <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,-16,0" x:Name="CountsGrid">
+                <Button Style="{StaticResource CountTile}" Click="Students_Click" Margin="0,0,16,16">
+                    <StackPanel>
+                        <Path Style="{StaticResource Icon}" Data="{StaticResource IconStudent}" TextElement.Foreground="{DynamicResource PrimaryBrush}"/>
+                        <TextBlock x:Name="StudentCount" Text="-" FontSize="30" FontWeight="Bold" Margin="0,12,0,0"/>
+                        <TextBlock Text="Students" Style="{StaticResource MutedText}"/>
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource CountTile}" Click="Teachers_Click" Margin="0,0,16,16">
+                    <StackPanel>
+                        <Path Style="{StaticResource Icon}" Data="{StaticResource IconTeacher}" TextElement.Foreground="{DynamicResource PrimaryBrush}"/>
+                        <TextBlock x:Name="TeacherCount" Text="-" FontSize="30" FontWeight="Bold" Margin="0,12,0,0"/>
+                        <TextBlock Text="Teachers" Style="{StaticResource MutedText}"/>
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource CountTile}" Click="Employees_Click" Margin="0,0,16,16">
+                    <StackPanel>
+                        <Path Style="{StaticResource Icon}" Data="{StaticResource IconEmployee}" TextElement.Foreground="{DynamicResource PrimaryBrush}"/>
+                        <TextBlock x:Name="EmployeeCount" Text="-" FontSize="30" FontWeight="Bold" Margin="0,12,0,0"/>
+                        <TextBlock Text="Employees" Style="{StaticResource MutedText}"/>
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource CountTile}" Click="Classes_Click" Margin="0,0,16,16">
+                    <StackPanel>
+                        <Path Style="{StaticResource Icon}" Data="{StaticResource IconClass}" TextElement.Foreground="{DynamicResource PrimaryBrush}"/>
+                        <TextBlock x:Name="ClassCount" Text="-" FontSize="30" FontWeight="Bold" Margin="0,12,0,0"/>
+                        <TextBlock Text="Classes" Style="{StaticResource MutedText}"/>
+                    </StackPanel>
+                </Button>
+            </UniformGrid>
+
+        <!-- First run: a short, ordered way in -->
+            <!-- First run: a short, ordered way in -->
+            <Border x:Name="WelcomeCard" Grid.Row="2" Grid.RowSpan="2" VerticalAlignment="Top" Style="{StaticResource Card}" Padding="28" Visibility="Collapsed">
+                <StackPanel>
+                    <TextBlock Text="Your register is empty. Start here." Style="{StaticResource TitleText}"/>
+                    <TextBlock Text="Set things up in this order and everything else falls into place." Style="{StaticResource MutedText}" Margin="0,6,0,20"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Width="32" Height="32" CornerRadius="16" Background="{DynamicResource AccentBrush}" VerticalAlignment="Top">
+                            <TextBlock Text="1" FontWeight="Bold" Foreground="#13302A" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Grid.Column="1" Margin="16,0,0,22">
+                            <TextBlock Text="Create a class" FontWeight="Bold" FontSize="16"/>
+                            <TextBlock Text="A class is the group students and teachers belong to." Style="{StaticResource MutedText}"/>
+                        </StackPanel>
+                        <Button Grid.Column="2" Content="New class" Click="NewClass_Click" VerticalAlignment="Top"/>
+
+                        <Border Grid.Row="1" Width="32" Height="32" CornerRadius="16" Background="{DynamicResource AccentBrush}" VerticalAlignment="Top">
+                            <TextBlock Text="2" FontWeight="Bold" Foreground="#13302A" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Margin="16,0,0,22">
+                            <TextBlock Text="Add your teachers" FontWeight="Bold" FontSize="16"/>
+                            <TextBlock Text="Contracts, modules and documents live on each teacher's page." Style="{StaticResource MutedText}"/>
+                        </StackPanel>
+                        <Button Grid.Row="1" Grid.Column="2" Content="New teacher" Click="NewTeacher_Click" VerticalAlignment="Top"/>
+
+                        <Border Grid.Row="2" Width="32" Height="32" CornerRadius="16" Background="{DynamicResource AccentBrush}" VerticalAlignment="Top">
+                            <TextBlock Text="3" FontWeight="Bold" Foreground="#13302A" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Grid.Row="2" Grid.Column="1" Margin="16,0,0,0">
+                            <TextBlock Text="Enrol your students" FontWeight="Bold" FontSize="16"/>
+                            <TextBlock Text="Pick a class for each student while you add them." Style="{StaticResource MutedText}"/>
+                        </StackPanel>
+                        <Button Grid.Row="2" Grid.Column="2" Content="New student" Click="NewStudent_Click" Style="{StaticResource PrimaryButton}" VerticalAlignment="Top"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+
+        <!-- Normal state: newest students and class sizes -->
+        <Grid x:Name="ActivityGrid" Grid.Row="2" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="16"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Style="{StaticResource Card}" Padding="0">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="0*"/>
-                        <ColumnDefinition Width="0*"/>
-                        <ColumnDefinition Width="900"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Button Click="PrevButton_Click" Grid.Column="0" Margin="-170,315,56,293" Style="{StaticResource BubblyButtonStyle}" Background="Transparent">
-                        <Button.Template>
-                            <ControlTemplate TargetType="Button">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </ControlTemplate>
-                        </Button.Template>
-                        <Image Source="/Image/Buttons/Left-Arrow.png" Stretch="Uniform" Width="70" Height="70"/>
-                    </Button>
-                    <Image x:Name="SlideImage1" Source="/Image/Home_Page.png" Stretch="Uniform" Grid.Column="1" Visibility="Visible" Grid.ColumnSpan="3" Margin="-13,24,-163,-4"/>
-                    <Image x:Name="SlideImage2" Source="/Image/2.png" Stretch="Uniform" Visibility="Collapsed" Margin="8,32,-158,0" Grid.ColumnSpan="4" Height="650" VerticalAlignment="Top"/>
-                    <Image x:Name="SlideImage3" Source="/Image/3.png" Stretch="Uniform" Grid.Column="3" Visibility="Collapsed" Margin="-2,30,-170,0"/>
-                    <Image x:Name="SlideImage4" Source="/Image/4.png" Stretch="Uniform" Grid.Column="3" Visibility="Collapsed" Margin="-2,30,-170,0"/>
-                    <Button Click="NextButton_Click" Grid.Column="3" Margin="1125,315,-296,293" Style="{StaticResource BubblyButtonStyle}" Background="Transparent">
-                        <Button.Template>
-                            <ControlTemplate TargetType="Button">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </ControlTemplate>
-                        </Button.Template>
-                        <Image Source="/Image/Buttons/Right-Arrow.png" Stretch="Uniform" Width="83" Height="70"/>
-                    </Button>
-
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Margin="20,16,20,10">
+                        <TextBlock Text="Recently added students" Style="{StaticResource SectionText}"/>
+                        <Button Content="See all" Style="{StaticResource GhostButton}" Foreground="{DynamicResource PrimaryBrush}" HorizontalAlignment="Right"
+                                MinHeight="30" Padding="10,0" Click="Students_Click"/>
+                    </Grid>
+                    <Grid x:Name="RecentHost" Grid.Row="1" ClipToBounds="True" SizeChanged="Host_SizeChanged">
+                        <ItemsControl x:Name="RecentList" Margin="8,0,8,0" VerticalAlignment="Top">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="12,8" Height="38">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Orientation="Horizontal">
+                                            <u:Avatar Photo="{Binding P_Pic}" Initials="{Binding Initials}" Width="38" Height="38"/>
+                                            <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding FullName}" FontWeight="Bold"/>
+                                                <TextBlock Text="{Binding Major, Converter={StaticResource Dash}}" Style="{StaticResource CaptionText}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1" Text="{Binding J_Date, Converter={StaticResource ShortDate}}" Style="{StaticResource CaptionText}" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock x:Name="RecentEmpty" Text="Students you add will be listed here." Style="{StaticResource MutedText}" Margin="20,0,20,20" Visibility="Collapsed" VerticalAlignment="Top"/>
+                    </Grid>
                 </Grid>
             </Border>
 
-            <!-- Text block to display current slide position -->
-            <TextBlock x:Name="SlideIndicator" Text="{Binding CurrentSlideIndicator}" FontSize="18" Grid.Column="4" Foreground="White" Width="70" Height="42"/>
+            <Border Grid.Column="2" Style="{StaticResource Card}" Padding="0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Class sizes" Style="{StaticResource SectionText}" Margin="20,16,20,12"/>
+                    <Grid x:Name="ClassHost" Grid.Row="1" ClipToBounds="True" SizeChanged="Host_SizeChanged">
+                        <ItemsControl x:Name="ClassSizes" Margin="20,0,20,0" VerticalAlignment="Top">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="0,0,0,14" Height="34">
+                                        <Grid>
+                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" TextTrimming="CharacterEllipsis" Margin="0,0,40,0"/>
+                                            <TextBlock Text="{Binding Count}" HorizontalAlignment="Right" Foreground="{DynamicResource MutedBrush}"/>
+                                        </Grid>
+                                        <ProgressBar Maximum="{Binding Max}" Value="{Binding Count}" Margin="0,6,0,0"
+                                                     Foreground="{DynamicResource PrimaryBrush}" Background="{DynamicResource LineBrush}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock x:Name="ClassSizesEmpty" Text="Classes you create will show how many students they hold." Style="{StaticResource MutedText}"
+                                   Margin="20,0,20,20" Visibility="Collapsed" VerticalAlignment="Top"/>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
 
-            <!-- Placeholder for the video -->
-            <!-- <MediaElement x:Name="VideoPlayer" Source="/Videos/Intro.mp4" Width="1236" Height="665" Grid.Column="5" Margin="0,20" IsMuted="True" LoadedBehavior="Play" UnloadedBehavior="Manual"/>
-                <Button Content="Play" Style="{StaticResource BubblyButtonStyle}" Click="VideoButton_Click" FontSize="20" Width="307" Height="39" RenderTransformOrigin="0.5,0.465"/> -->
-        </StackPanel>
-        <!-- </ScrollViewer> -->
+        <!-- Insights: where the register needs a look -->
+        <Grid x:Name="InsightsGrid" Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="16"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="16"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Students by major -->
+            <Border Style="{StaticResource Card}" Padding="0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Students by major" Style="{StaticResource SectionText}" Margin="20,16,20,12"/>
+                    <Grid x:Name="MajorHost" Grid.Row="1" ClipToBounds="True" SizeChanged="Host_SizeChanged">
+                        <ItemsControl x:Name="MajorList" Margin="20,0,20,0" VerticalAlignment="Top">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="0,0,0,14" Height="34">
+                                        <Grid>
+                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" TextTrimming="CharacterEllipsis" Margin="0,0,40,0"/>
+                                            <TextBlock Text="{Binding Count}" HorizontalAlignment="Right" Foreground="{DynamicResource MutedBrush}"/>
+                                        </Grid>
+                                        <ProgressBar Maximum="{Binding Max}" Value="{Binding Count}" Margin="0,6,0,0"
+                                                     Foreground="{DynamicResource AccentBrush}" Background="{DynamicResource LineBrush}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock x:Name="MajorEmpty" Text="Majors appear here once students have one." Style="{StaticResource MutedText}"
+                                   Margin="20,0,20,20" Visibility="Collapsed" VerticalAlignment="Top"/>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- Contracts ending soon -->
+            <Border Grid.Column="2" Style="{StaticResource Card}" Padding="0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Margin="20,16,20,10">
+                        <TextBlock Text="Contracts ending soon" Style="{StaticResource SectionText}"/>
+                        <TextBlock Text="Teachers and employees, next 90 days" Style="{StaticResource CaptionText}" Margin="0,2,0,0"/>
+                    </StackPanel>
+                    <Grid x:Name="ContractHost" Grid.Row="1" ClipToBounds="True" SizeChanged="Host_SizeChanged">
+                        <ItemsControl x:Name="ContractList" Margin="8,0,8,0" VerticalAlignment="Top">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="12,7" Height="36">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding Detail}" Style="{StaticResource CaptionText}" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1" Text="{Binding When}" Style="{StaticResource CaptionText}" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock x:Name="ContractsEmpty" Text="No contract ends in the next 90 days." Style="{StaticResource MutedText}"
+                                   Margin="20,0,20,20" Visibility="Collapsed" VerticalAlignment="Top"/>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- Records to complete -->
+            <Border Grid.Column="4" Style="{StaticResource Card}" Padding="0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Margin="20,16,20,10">
+                        <TextBlock Text="Records to complete" Style="{StaticResource SectionText}"/>
+                        <TextBlock Text="Missing a photo or an ID card scan" Style="{StaticResource CaptionText}" Margin="0,2,0,0"/>
+                    </StackPanel>
+                    <Grid x:Name="GapHost" Grid.Row="1" ClipToBounds="True" SizeChanged="Host_SizeChanged">
+                        <ItemsControl x:Name="GapList" Margin="8,0,8,0" VerticalAlignment="Top">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="12,7" Height="22">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Count}" FontWeight="Bold" VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource PrimaryBrush}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock x:Name="GapsEmpty" Text="Every record has a photo and both ID scans." Style="{StaticResource MutedText}"
+                                   Margin="20,0,20,20" Visibility="Collapsed" VerticalAlignment="Top"/>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>

@@ -1,0 +1,42 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Classic: the original EduTrack colours (charcoal #212529, panel #272B2F, cyan #10CCFC, cornflower blue buttons) -->
+    <SolidColorBrush x:Key="BgBrush" Color="#212529"/>
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#272B2F"/>
+    <SolidColorBrush x:Key="SurfaceAltBrush" Color="#2E3338"/>
+    <SolidColorBrush x:Key="SurfaceHoverBrush" Color="#343A40"/>
+    <SolidColorBrush x:Key="LineBrush" Color="#3E434A"/>
+    <SolidColorBrush x:Key="LineStrongBrush" Color="#565D66"/>
+    <SolidColorBrush x:Key="InkBrush" Color="#F1F3F5"/>
+    <SolidColorBrush x:Key="MutedBrush" Color="#A9B3C9"/>
+    <SolidColorBrush x:Key="FaintBrush" Color="#808BA8"/>
+    <SolidColorBrush x:Key="PrimaryBrush" Color="#6495ED"/>
+    <SolidColorBrush x:Key="PrimaryHoverBrush" Color="#7DA7F2"/>
+    <SolidColorBrush x:Key="PrimaryPressedBrush" Color="#4F82E6"/>
+    <SolidColorBrush x:Key="PrimarySoftBrush" Color="#2B3A5A"/>
+    <SolidColorBrush x:Key="OnPrimaryBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="#10CCFC"/>
+    <SolidColorBrush x:Key="AccentSoftBrush" Color="#153A44"/>
+    <SolidColorBrush x:Key="DangerBrush" Color="#FF8479"/>
+    <SolidColorBrush x:Key="DangerHoverBrush" Color="#FF9A91"/>
+    <SolidColorBrush x:Key="DangerSoftBrush" Color="#3B2326"/>
+    <SolidColorBrush x:Key="SuccessBrush" Color="#5BC384"/>
+    <SolidColorBrush x:Key="SuccessSoftBrush" Color="#1F3629"/>
+    <SolidColorBrush x:Key="FocusBrush" Color="#10CCFC"/>
+    <SolidColorBrush x:Key="ScrimBrush" Color="#99000000"/>
+    <SolidColorBrush x:Key="SidebarBrush" Color="#272B2F"/>
+    <SolidColorBrush x:Key="SidebarHoverBrush" Color="#3E434A"/>
+    <SolidColorBrush x:Key="SidebarActiveBrush" Color="#343A40"/>
+    <SolidColorBrush x:Key="SidebarInkBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="SidebarMutedBrush" Color="#A0A8B0"/>
+    <SolidColorBrush x:Key="SidebarLineBrush" Color="#3A3F45"/>
+    <SolidColorBrush x:Key="InputHintBrush" Color="#262D42"/>
+    <SolidColorBrush x:Key="InputInkBrush" Color="#14171C"/>
+    <SolidColorBrush x:Key="ButtonBgBrush" Color="#444C54"/>
+    <SolidColorBrush x:Key="ButtonHoverBrush" Color="#515A64"/>
+    <SolidColorBrush x:Key="TitleBrush" Color="#10CCFC"/>
+    <SolidColorBrush x:Key="ButtonBorderBrush" Color="#9AA3BD"/>
+    <SolidColorBrush x:Key="InputReadOnlyBrush" Color="#69738F"/>
+    <SolidColorBrush x:Key="InputBorderBrush" Color="#9AA3BD"/>
+    <SolidColorBrush x:Key="InputBgBrush" Color="#808BA8"/>
+</ResourceDictionary>

@@ -1,123 +1,135 @@
-﻿using Bogus;
-using EduTrack.Models;
-using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 using EduTrack.Data;
+using EduTrack.Models;
+using EduTrack.Utilities;
+using MySql.Data.MySqlClient;
 
 namespace EduTrack.View
 {
     public partial class ShowStudents : UserControl
     {
+        private readonly DispatcherTimer _searchDelay = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
+
         public ShowStudents()
         {
             InitializeComponent();
-            LoadStudents();
-            this.DataContext = this;
+            _searchDelay.Tick += async (s, e) => { _searchDelay.Stop(); await LoadStudentsAsync(SearchBox.Text.Trim()); };
+            Loaded += async (s, e) => { await LoadStudentsAsync(); SearchBox.Focus(); };
         }
 
-        private void Button_Click1(object sender, RoutedEventArgs e)
+        private void OpenSelected()
         {
-            Student selectedStudent = StudentsList.SelectedItem as Student;
+            if (!(StudentsList.SelectedItem is Student selected)) return;
 
-            if (selectedStudent == null)
-            {
-                MessageBox.Show("Please select a student first.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
+            var host = HubHelper.FindDetailHost(this);
+            if (host == null) return;
+            var detailedView = new DetailedStudentInfoView(selected);
+            detailedView.Closed += (s, e) => host.CloseDetail();
+            host.ShowDetail(detailedView);
+        }
 
-            DetailedStudentInfoView detailedView = new DetailedStudentInfoView(selectedStudent)
-            {
-                SizeToContent = SizeToContent.WidthAndHeight,
-                WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                Title = "Student Details"
-            };
-            detailedView.ShowDialog();
+        private void Button_Click1(object sender, RoutedEventArgs e) => OpenSelected();
+
+        private void StudentsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (e.OriginalSource is DependencyObject source && ItemsControl.ContainerFromElement(StudentsList, source) is DataGridRow)
+                OpenSelected();
+        }
+
+        private void StudentsList_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter) { OpenSelected(); e.Handled = true; }
         }
 
         private async Task LoadStudentsAsync(string searchText = null)
         {
-            string query = "SELECT StudentID, p_pic ,f_name, m_name, l_name, gender, email, phone, b_date, nationality, cin, j_date, Major FROM student_registry";
-            if (!string.IsNullOrEmpty(searchText))
-            {
-                query += $" WHERE f_name LIKE '%{searchText}%' OR m_name LIKE '%{searchText}%' OR l_name LIKE '%{searchText}%'";
-            }
+            string query = "SELECT StudentID, p_pic, f_name, m_name, l_name, gender, email, phone, b_date, nationality, cin, j_date, major FROM student_registry";
+            bool searching = !string.IsNullOrEmpty(searchText);
+            if (searching)
+                query += " WHERE f_name LIKE @q OR m_name LIKE @q OR l_name LIKE @q OR CONCAT(f_name, ' ', l_name) LIKE @q";
+            query += " ORDER BY l_name, f_name";
 
-            ObservableCollection<Student> studentList = new ObservableCollection<Student>();
-
+            var students = new ObservableCollection<Student>();
             try
             {
                 using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
-                    using (MySqlCommand command = new MySqlCommand(query, connection))
-                    using (MySqlDataReader reader = (MySqlDataReader)await command.ExecuteReaderAsync())
+                    using (var command = new MySqlCommand(query, connection))
                     {
-                        while (await reader.ReadAsync())
+                        if (searching) command.Parameters.AddWithValue("@q", "%" + searchText + "%");
+                        using (var reader = (MySqlDataReader)await command.ExecuteReaderAsync())
                         {
-                            Student student = new Student
+                            while (await reader.ReadAsync())
                             {
-                                Id = reader.GetInt32("StudentID"),
-                                F_Name = reader.IsDBNull(reader.GetOrdinal("f_name")) ? null : reader.GetString("f_name"),
-                                M_Name = reader.IsDBNull(reader.GetOrdinal("m_name")) ? null : reader.GetString("m_name"),
-                                L_Name = reader.IsDBNull(reader.GetOrdinal("l_name")) ? null : reader.GetString("l_name"),
-                                Gender = reader.IsDBNull(reader.GetOrdinal("gender")) ? null : reader.GetString("gender"),
-                                Email = reader.IsDBNull(reader.GetOrdinal("email")) ? null : reader.GetString("email"),
-                                Phone = reader.IsDBNull(reader.GetOrdinal("phone")) ? null : reader.GetString("phone"),
-                                B_Date = reader.IsDBNull(reader.GetOrdinal("b_date")) ? (DateTime?)null : reader.GetDateTime("b_date"),
-                                Nationality = reader.IsDBNull(reader.GetOrdinal("nationality")) ? null : reader.GetString("nationality"),
-                                CIN = reader.IsDBNull(reader.GetOrdinal("cin")) ? null : reader.GetString("cin"),
-                                Major = reader.IsDBNull(reader.GetOrdinal("major")) ? null : reader.GetString("major"),
-                                J_Date = reader.IsDBNull(reader.GetOrdinal("j_date")) ? (DateTime?)null : reader.GetDateTime("j_date"),
-                                P_Pic = reader.IsDBNull(reader.GetOrdinal("p_pic")) ? null : reader.GetString("p_pic"),
-                            };
-                            studentList.Add(student);
+                                students.Add(new Student
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("StudentID")),
+                                    P_Pic = reader.Str("p_pic"),
+                                    F_Name = reader.Str("f_name"),
+                                    M_Name = reader.Str("m_name"),
+                                    L_Name = reader.Str("l_name"),
+                                    Gender = reader.Str("gender"),
+                                    Email = reader.Str("email"),
+                                    Phone = reader.Str("phone"),
+                                    B_Date = reader.Date("b_date"),
+                                    Nationality = reader.Str("nationality"),
+                                    CIN = reader.Str("cin"),
+                                    Major = reader.Str("major"),
+                                    J_Date = reader.Date("j_date")
+                                });
+                            }
                         }
                     }
                 }
-
-                Dispatcher.Invoke(() =>
-                {
-                    StudentsList.ItemsSource = studentList;
-                });
+                StudentsList.ItemsSource = students;
+                ShowState(students.Count, searching ? searchText : null);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowState(0, null);
+                MessageBox.Show("The student list could not be loaded. Check that the database is running.\n" + ex.Message,
+                    "Can't load students", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private async void LoadStudents()
+        private void ShowState(int count, string search)
         {
+            CountText.Text = search == null ? (count == 1 ? "1 student" : count + " students")
+                                            : (count == 1 ? "1 match" : count + " matches");
+            bool empty = count == 0;
+            EmptyState.Visibility = empty ? Visibility.Visible : Visibility.Collapsed;
+            StudentsList.Visibility = empty ? Visibility.Collapsed : Visibility.Visible;
+            if (!empty) return;
 
-            await LoadStudentsAsync();
+            if (search != null)
+            {
+                EmptyTitle.Text = "No student matches “" + search + "”";
+                EmptyHint.Text = "Check the spelling, or try just a first or last name.";
+                EmptyAction.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                EmptyTitle.Text = "No students yet";
+                EmptyHint.Text = "Students you add will show up here, ready to search and open.";
+                EmptyAction.Visibility = Visibility.Visible;
+            }
         }
 
-        private async void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string searchText = SearchBox.Text;
-            await LoadStudentsAsync(searchText);
+            _searchDelay.Stop();
+            _searchDelay.Start();
         }
 
-        private void ScrollViewer_MouseEnter(object sender, MouseEventArgs e)
-        {
-            (sender as ScrollViewer)?.Focus();
-        }
+        private async void Refresh_Click(object sender, RoutedEventArgs e) => await LoadStudentsAsync(SearchBox.Text.Trim());
 
-        private void ListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            ScrollViewer scv = (ScrollViewer)sender;
-            scv.ScrollToVerticalOffset(scv.VerticalOffset - e.Delta);
-            e.Handled = true;
-        }
-        private async void Refresh_Click(object sender, RoutedEventArgs e)
-        {
-            await LoadStudentsAsync();
-        }
+        private void EmptyAction_Click(object sender, RoutedEventArgs e) => HubHelper.Find(this)?.SelectTab(0);
     }
 }

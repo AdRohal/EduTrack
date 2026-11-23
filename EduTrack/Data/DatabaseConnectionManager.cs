@@ -1,28 +1,37 @@
-using MySql.Data.MySqlClient;
 using System;
 using System.Configuration;
+using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 
 namespace EduTrack.Data
 {
     /// <summary>
     /// Centralized database connection manager for the EduTrack application.
-    /// Provides a single point of configuration for all database connections.
+    /// Connection details come from the appSettings in EduTrack.exe.config and default to a local XAMPP / MySQL / MariaDB server.
     /// </summary>
     public static class DatabaseConnectionManager
     {
-        #region Database Configuration Constants
-        private const string DatabaseServer = "127.0.0.1";
-        private const string DatabaseName = "database";
-        private const string DatabaseUser = "root";
-        private const string DatabasePassword = "";
+        #region Database Configuration
+        private static string Setting(string key, string fallback)
+        {
+            string value = ConfigurationManager.AppSettings[key];
+            return string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();
+        }
+
+        public static string Server => Setting("Db.Server", "127.0.0.1");
+        public static string Port => Setting("Db.Port", "3306");
+        public static string DatabaseName => Setting("Db.Name", "database");
+        private static string DatabaseUser => Setting("Db.User", "root");
+        private static string DatabasePassword => ConfigurationManager.AppSettings["Db.Password"] ?? string.Empty;
         #endregion
 
         #region Connection String Property
         /// <summary>
         /// Gets the complete database connection string.
         /// </summary>
-        public static string ConnectionString =>
-            $"Server={DatabaseServer};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};";
+        public static string ConnectionString => EmbeddedDatabase.IsBundled
+            ? EmbeddedDatabase.ConnectionBase + "Database=" + DatabaseName + ";"
+            : $"Server={Server};Port={Port};Database={DatabaseName};User ID={DatabaseUser};Password={DatabasePassword};CharSet=utf8mb4;";
         #endregion
 
         #region Connection Factory Methods
@@ -54,18 +63,7 @@ namespace EduTrack.Data
         /// <returns>True if the connection is successful, false otherwise</returns>
         public static bool TestConnection()
         {
-            try
-            {
-                using (var connection = CreateConnection())
-                {
-                    connection.Open();
-                    return true;
-                }
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            return TestConnection(out _);
         }
 
         /// <summary>
@@ -88,6 +86,29 @@ namespace EduTrack.Data
             {
                 errorMessage = ex.Message;
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Runs one tiny asynchronous query so the first real page doesn't pay the start-up cost of the async code path.
+        /// </summary>
+        public static async Task WarmUpAsync()
+        {
+            try
+            {
+                using (var connection = CreateConnection())
+                {
+                    await connection.OpenAsync();
+                    using (var command = new MySqlCommand("SELECT 1", connection))
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        await reader.ReadAsync();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // The splash screen reports connection problems; warming up is only an optimisation.
             }
         }
         #endregion

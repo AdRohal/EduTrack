@@ -1,0 +1,25 @@
+﻿<Window Style="{StaticResource {x:Type Window}}" x:Class="EduTrack.Utilities.AppDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent" ShowInTaskbar="False"
+        SizeToContent="WidthAndHeight" ResizeMode="NoResize" WindowStartupLocation="CenterOwner"
+        KeyDown="Window_KeyDown">
+    <Border Margin="24" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+            CornerRadius="14" MinWidth="380" MaxWidth="480">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="28" ShadowDepth="6" Opacity="0.35" Color="#000000"/>
+        </Border.Effect>
+        <StackPanel Margin="26,24,26,20">
+            <StackPanel Orientation="Horizontal">
+                <Border x:Name="IconBadge" Width="38" Height="38" CornerRadius="19" VerticalAlignment="Top">
+                    <TextBlock x:Name="IconGlyph" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="20"/>
+                </Border>
+                <StackPanel Margin="16,0,0,0" MaxWidth="360">
+                    <TextBlock x:Name="TitleText" Style="{StaticResource SectionText}" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                    <TextBlock x:Name="MessageText" Style="{StaticResource MutedText}" Margin="0,8,0,0" FontSize="14" LineHeight="21"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel x:Name="ButtonRow" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0"/>
+        </StackPanel>
+    </Border>
+</Window>

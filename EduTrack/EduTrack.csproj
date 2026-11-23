@@ -1,8 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Microsoft.Windows.SDK.Contracts.10.0.18362.2005\build\Microsoft.Windows.SDK.Contracts.props" Condition="Exists('..\packages\Microsoft.Windows.SDK.Contracts.10.0.18362.2005\build\Microsoft.Windows.SDK.Contracts.props')" />
-  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
-  <Import Project="..\packages\SQLite.3.13.0\build\net45\SQLite.props" Condition="Exists('..\packages\SQLite.3.13.0\build\net45\SQLite.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,6 +9,7 @@
     <RootNamespace>EduTrack</RootNamespace>
     <AssemblyName>EduTrack</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -60,6 +58,7 @@
     <ApplicationIcon>1.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="QRCoder" Version="1.6.0" />
     <PackageReference Include="Bogus">
       <Version>35.5.1</Version>
     </PackageReference>
@@ -80,10 +79,11 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
-    </Reference>
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -94,6 +94,15 @@
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="WindowsBase" />
+    <Reference Include="Windows">
+      <HintPath>C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.26100.0\Windows.winmd</HintPath>
+      <IsWinMDFile>true</IsWinMDFile>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Runtime.WindowsRuntime">
+      <HintPath>C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Runtime.WindowsRuntime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
   </ItemGroup>
@@ -103,6 +112,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Data\DatabaseConnectionManager.cs" />
+    <Compile Include="Data\EmbeddedDatabase.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
@@ -115,9 +125,6 @@
     <Compile Include="Models\Student.cs" />
     <Compile Include="Models\Teacher.cs" />
     <Compile Include="Models\Employee.cs" />
-    <Compile Include="SignUpPage.xaml.cs">
-      <DependentUpon>SignUpPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Utilities\Btn.cs" />
     <Compile Include="Utilities\RelayCommand.cs" />
     <Compile Include="Utilities\ViewModelBase.cs" />
@@ -161,8 +168,8 @@
     <Compile Include="View\DetailedTeacherInfoView.xaml.cs">
       <DependentUpon>DetailedTeacherInfoView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\DocumentViewerWindow.xaml.cs">
-      <DependentUpon>DocumentViewerWindow.xaml</DependentUpon>
+    <Compile Include="View\DocumentViewerOverlay.xaml.cs">
+      <DependentUpon>DocumentViewerOverlay.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\GeneralSettings.xaml.cs">
       <DependentUpon>GeneralSettings.xaml</DependentUpon>
@@ -237,38 +244,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SignUpPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Styles\Button.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Styles\Button_Style.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Styles\Image.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Styles\Page.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Styles\ScrollBar.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Styles\Text.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Styles\TextBox.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Utilities\DataTemplate.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -301,7 +276,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\DocumentViewerWindow.xaml">
+    <Page Include="View\DocumentViewerOverlay.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -408,155 +383,36 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Image\LoadingScreen.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="1.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Image\MainIcon.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Image\Icons\user.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Image\Icons\padlock.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Image\img_customer.png" />
-    <Resource Include="Image\img_home.png" />
-    <Resource Include="Image\img_order.png" />
-    <Resource Include="Image\img_setting.png" />
-    <Resource Include="Image\img_transaction.png" />
-    <Resource Include="Image\Icons\shutdown_def.png" />
-    <Resource Include="Image\Icons\shutdown_mo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Image\Logo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Image\Students-info.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Image\Icons\class-icon.png" />
-    <Resource Include="Image\Icons\grades-icon.png" />
-    <Resource Include="Image\Icons\schedule-icon.png" />
-    <Resource Include="Image\Icons\teacher-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Image\member-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Images\NewStudent.png" />
-    <Resource Include="View\Images\StudentsList.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Images\Student_background.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Image\ProfileIcon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Image\Home_Page.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Images\NewMember.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Images\ListMembers.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Images\AudioSettings.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Images\GeneralSettings.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Images\NewTeacher.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Images\ShowTeachers.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Images\NewClass.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Images\ShowClasses.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Images\StudentImage.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Images\TeacherImage.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Images\ClassImage.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Images\SettingsBackground.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Images\Transaction.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Image\2.png" />
-    <Resource Include="Image\3.png" />
-    <Resource Include="Image\4.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Images\View-Icon.png" />
-    <Resource Include="View\Images\EmployeeImage.png" />
-    <Resource Include="Image\Logo4.png" />
-    <Resource Include="Image\MainLogo2.png" />
-    <Resource Include="Image\MainIcon2.png" />
-    <Resource Include="Image\Buttons\Left-Arrow.png" />
-    <Resource Include="Image\Buttons\Right-Arrow.png" />
-    <Resource Include="Image\Icons\user-blue.png" />
-    <Resource Include="Image\Icons\minimize-red.png" />
-    <Resource Include="Image\Icons\minimize-white.png" />
-    <Resource Include="Image\Icons\maximize-red.png" />
-    <Resource Include="Image\Icons\maximize-white.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Image\Icons\Refresh.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Image\Icons\Refresh-Blue.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Image\Icons\About.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Image\Icons\icon-github.png" />
-    <Resource Include="Image\Icons\icon-linkedin.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Image\QR-code.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Image\Icons\icon-paypal.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Image\Icons\dark-mode.png" />
-    <Resource Include="Image\Icons\light-mode.png" />
+    <Page Include="Styles\Theme.Classic.xaml"><Generator>MSBuild:Compile</Generator><SubType>Designer</SubType></Page>
+    <Page Include="Styles\Theme.Light.xaml"><Generator>MSBuild:Compile</Generator><SubType>Designer</SubType></Page>
+    <Page Include="Styles\Theme.Dark.xaml"><Generator>MSBuild:Compile</Generator><SubType>Designer</SubType></Page>
+    <Page Include="Styles\Icons.xaml"><Generator>MSBuild:Compile</Generator><SubType>Designer</SubType></Page>
+    <Page Include="Styles\Controls.xaml"><Generator>MSBuild:Compile</Generator><SubType>Designer</SubType></Page>
+    <Page Include="Utilities\AppDialog.xaml"><Generator>MSBuild:Compile</Generator><SubType>Designer</SubType></Page>
+    <Page Include="Utilities\ToastWindow.xaml"><Generator>MSBuild:Compile</Generator><SubType>Designer</SubType></Page>
+    <Page Include="Utilities\LogoMark.xaml"><Generator>MSBuild:Compile</Generator><SubType>Designer</SubType></Page>
+    <Page Include="Utilities\Avatar.xaml"><Generator>MSBuild:Compile</Generator><SubType>Designer</SubType></Page>
+    <Compile Include="MessageBox.cs" />
+    <Compile Include="Data\SchemaUpgrades.cs" />
+    <Compile Include="Models\NameHelper.cs" />
+    <Compile Include="Utilities\AppDialog.xaml.cs"><DependentUpon>AppDialog.xaml</DependentUpon></Compile>
+    <Compile Include="Utilities\ToastWindow.xaml.cs"><DependentUpon>ToastWindow.xaml</DependentUpon></Compile>
+    <Compile Include="Utilities\LogoMark.xaml.cs"><DependentUpon>LogoMark.xaml</DependentUpon></Compile>
+    <Compile Include="Utilities\Avatar.xaml.cs"><DependentUpon>Avatar.xaml</DependentUpon></Compile>
+    <Compile Include="Utilities\AuthService.cs" />
+    <Compile Include="Utilities\Converters.cs" />
+    <Compile Include="Utilities\FormValidation.cs" />
+    <Compile Include="Utilities\FormHelper.cs" />
+    <Compile Include="Utilities\IHub.cs" />
+    <Compile Include="Utilities\ReaderExtensions.cs" />
+    <Compile Include="Utilities\ThemeManager.cs" />
+    <Resource Include="Fonts\AtkinsonHyperlegible-Regular.ttf" />
+    <Resource Include="Fonts\AtkinsonHyperlegible-Bold.ttf" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\SQLite.3.13.0\build\net45\SQLite.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SQLite.3.13.0\build\net45\SQLite.props'))" />
-    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
-    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
-    <Error Condition="!Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets'))" />
-    <Error Condition="!Exists('..\packages\System.Runtime.WindowsRuntime.4.6.0\build\net461\System.Runtime.WindowsRuntime.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Runtime.WindowsRuntime.4.6.0\build\net461\System.Runtime.WindowsRuntime.targets'))" />
-    <Error Condition="!Exists('..\packages\System.Runtime.WindowsRuntime.UI.Xaml.4.6.0\build\net461\System.Runtime.WindowsRuntime.UI.Xaml.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Runtime.WindowsRuntime.UI.Xaml.4.6.0\build\net461\System.Runtime.WindowsRuntime.UI.Xaml.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.Windows.SDK.Contracts.10.0.18362.2005\build\Microsoft.Windows.SDK.Contracts.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.SDK.Contracts.10.0.18362.2005\build\Microsoft.Windows.SDK.Contracts.props'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.Windows.SDK.Contracts.10.0.18362.2005\build\Microsoft.Windows.SDK.Contracts.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.SDK.Contracts.10.0.18362.2005\build\Microsoft.Windows.SDK.Contracts.targets'))" />
-  </Target>
-  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
-  <Import Project="..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets" Condition="Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" />
-  <Import Project="..\packages\System.Runtime.WindowsRuntime.4.6.0\build\net461\System.Runtime.WindowsRuntime.targets" Condition="Exists('..\packages\System.Runtime.WindowsRuntime.4.6.0\build\net461\System.Runtime.WindowsRuntime.targets')" />
-  <Import Project="..\packages\System.Runtime.WindowsRuntime.UI.Xaml.4.6.0\build\net461\System.Runtime.WindowsRuntime.UI.Xaml.targets" Condition="Exists('..\packages\System.Runtime.WindowsRuntime.UI.Xaml.4.6.0\build\net461\System.Runtime.WindowsRuntime.UI.Xaml.targets')" />
-  <Import Project="..\packages\Microsoft.Windows.SDK.Contracts.10.0.18362.2005\build\Microsoft.Windows.SDK.Contracts.targets" Condition="Exists('..\packages\Microsoft.Windows.SDK.Contracts.10.0.18362.2005\build\Microsoft.Windows.SDK.Contracts.targets')" />
 </Project>

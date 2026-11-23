@@ -1,127 +1,143 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Windows.Controls;
-using MySql.Data.MySqlClient;
-using EduTrack.Models;
-using System.Windows;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 using EduTrack.Data;
+using EduTrack.Models;
+using EduTrack.Utilities;
+using MySql.Data.MySqlClient;
 
 namespace EduTrack.View
 {
     public partial class ShowEmployees : UserControl
     {
+        private readonly DispatcherTimer _searchDelay = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
+
         public ShowEmployees()
         {
             InitializeComponent();
-            LoadEmployees();
-            this.DataContext = this;
+            _searchDelay.Tick += async (s, e) => { _searchDelay.Stop(); await LoadEmployeesAsync(SearchBox.Text.Trim()); };
+            Loaded += async (s, e) => { await LoadEmployeesAsync(); SearchBox.Focus(); };
         }
 
-        private void Button_Click1(object sender, RoutedEventArgs e)
+        private void OpenSelected()
         {
-            Employee selectedEmployee = EmployeesList.SelectedItem as Employee;
+            if (!(EmployeesList.SelectedItem is Employee selected)) return;
 
-            if (selectedEmployee == null)
-            {
-                MessageBox.Show("Please select an employee first.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
+            var host = HubHelper.FindDetailHost(this);
+            if (host == null) return;
+            var detailedView = new DetailedEmployeeInfoView(selected);
+            detailedView.Closed += (s, e) => host.CloseDetail();
+            host.ShowDetail(detailedView);
+        }
 
-            DetailedEmployeeInfoView detailedView = new DetailedEmployeeInfoView(selectedEmployee)
-            {
-                SizeToContent = SizeToContent.WidthAndHeight,
-                WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                Title = "Employee Details"
-            };
-            detailedView.ShowDialog();
+        private void Button_Click1(object sender, RoutedEventArgs e) => OpenSelected();
+
+        private void EmployeesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (e.OriginalSource is DependencyObject source && ItemsControl.ContainerFromElement(EmployeesList, source) is DataGridRow)
+                OpenSelected();
+        }
+
+        private void EmployeesList_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter) { OpenSelected(); e.Handled = true; }
         }
 
         private async Task LoadEmployeesAsync(string searchText = null)
         {
             string query = "SELECT id, p_pic, f_name, m_name, l_name, gender, email, phone, b_date, nationality, cin, address, organization, role, j_date, contract_start, contract_end, high_degree, year_graduation, university, specialization, salary FROM employee_registry";
-            if (!string.IsNullOrEmpty(searchText))
-            {
-                query += $" WHERE f_name LIKE '%{searchText}%' OR m_name LIKE '%{searchText}%' OR l_name LIKE '%{searchText}%'";
-            }
+            bool searching = !string.IsNullOrEmpty(searchText);
+            if (searching)
+                query += " WHERE f_name LIKE @q OR m_name LIKE @q OR l_name LIKE @q OR CONCAT(f_name, ' ', l_name) LIKE @q";
+            query += " ORDER BY l_name, f_name";
 
-            ObservableCollection<Employee> empList = new ObservableCollection<Employee>();
-
+            var employees = new ObservableCollection<Employee>();
             try
             {
                 using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
-                    using (MySqlCommand command = new MySqlCommand(query, connection))
-                    using (MySqlDataReader reader = (MySqlDataReader)await command.ExecuteReaderAsync())
+                    using (var command = new MySqlCommand(query, connection))
                     {
-                        while (await reader.ReadAsync())
+                        if (searching) command.Parameters.AddWithValue("@q", "%" + searchText + "%");
+                        using (var reader = (MySqlDataReader)await command.ExecuteReaderAsync())
                         {
-                            Employee employee = new Employee
+                            while (await reader.ReadAsync())
                             {
-                                Id = reader.GetInt32("id"),
-                                P_Pic = reader.IsDBNull(reader.GetOrdinal("p_pic")) ? null : reader.GetString("p_pic"),
-                                FirstName = reader.IsDBNull(reader.GetOrdinal("f_name")) ? null : reader.GetString("f_name"),
-                                MiddleName = reader.IsDBNull(reader.GetOrdinal("m_name")) ? null : reader.GetString("m_name"),
-                                LastName = reader.IsDBNull(reader.GetOrdinal("l_name")) ? null : reader.GetString("l_name"),
-                                Gender = reader.IsDBNull(reader.GetOrdinal("gender")) ? null : reader.GetString("gender"),
-                                Email = reader.IsDBNull(reader.GetOrdinal("email")) ? null : reader.GetString("email"),
-                                Phone = reader.IsDBNull(reader.GetOrdinal("phone")) ? null : reader.GetString("phone"),
-                                BirthDate = reader.IsDBNull(reader.GetOrdinal("b_date")) ? (DateTime?)null : reader.GetDateTime("b_date"),
-                                Nationality = reader.IsDBNull(reader.GetOrdinal("nationality")) ? null : reader.GetString("nationality"),
-                                Cin = reader.IsDBNull(reader.GetOrdinal("cin")) ? null : reader.GetString("cin"),
-                                Address = reader.IsDBNull(reader.GetOrdinal("address")) ? null : reader.GetString("address"),
-                                Organization = reader.IsDBNull(reader.GetOrdinal("organization")) ? null : reader.GetString("organization"),
-                                Role = reader.IsDBNull(reader.GetOrdinal("role")) ? null : reader.GetString("role"),
-                                HighestDegree = reader.IsDBNull(reader.GetOrdinal("high_degree")) ? null : reader.GetString("high_degree"),
-                                University = reader.IsDBNull(reader.GetOrdinal("university")) ? null : reader.GetString("university"),
-                                JoinDate = reader.IsDBNull(reader.GetOrdinal("j_date")) ? (DateTime?)null : reader.GetDateTime("j_date"),
-                                ContractStartDate = reader.IsDBNull(reader.GetOrdinal("contract_start")) ? (DateTime?)null : reader.GetDateTime("contract_start"),
-                                ContractEndDate = reader.IsDBNull(reader.GetOrdinal("contract_end")) ? (DateTime?)null : reader.GetDateTime("contract_end"),
-                                YearGraduation = reader.IsDBNull(reader.GetOrdinal("year_graduation")) ? (int?)null : reader.GetInt32("year_graduation"),
-                                Salary = reader.IsDBNull(reader.GetOrdinal("salary")) ? 0 : reader.GetInt32("salary")
-                            };
-                            empList.Add(employee);
+                                employees.Add(new Employee
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                    P_Pic = reader.Str("p_pic"),
+                                    FirstName = reader.Str("f_name"),
+                                    MiddleName = reader.Str("m_name"),
+                                    LastName = reader.Str("l_name"),
+                                    Gender = reader.Str("gender"),
+                                    Email = reader.Str("email"),
+                                    Phone = reader.Str("phone"),
+                                    BirthDate = reader.Date("b_date"),
+                                    Nationality = reader.Str("nationality"),
+                                    Cin = reader.Str("cin"),
+                                    Address = reader.Str("address"),
+                                    Organization = reader.Str("organization"),
+                                    Role = reader.Str("role"),
+                                    HighestDegree = reader.Str("high_degree"),
+                                    University = reader.Str("university"),
+                                    JoinDate = reader.Date("j_date"),
+                                    ContractStartDate = reader.Date("contract_start"),
+                                    ContractEndDate = reader.Date("contract_end"),
+                                    YearGraduation = reader.Int("year_graduation"),
+                                    Salary = reader.Int("salary") ?? 0
+                                });
+                            }
                         }
                     }
                 }
-
-                Dispatcher.Invoke(() =>
-                {
-                    EmployeesList.ItemsSource = empList;
-                });
+                EmployeesList.ItemsSource = employees;
+                ShowState(employees.Count, searching ? searchText : null);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowState(0, null);
+                MessageBox.Show("The employee list could not be loaded. Check that the database is running.\n" + ex.Message,
+                    "Can't load employees", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private async void LoadEmployees()
+        private void ShowState(int count, string search)
         {
-            await LoadEmployeesAsync();
-        }
-        private async void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            string searchText = SearchBox.Text;
-            await LoadEmployeesAsync(searchText);
-        }
-        private void ScrollViewer_MouseEnter(object sender, MouseEventArgs e)
-        {
-            (sender as ScrollViewer)?.Focus();
-        }
-        private void ListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            ScrollViewer scv = (ScrollViewer)sender;
-            scv.ScrollToVerticalOffset(scv.VerticalOffset - e.Delta);
-            e.Handled = true;
+            CountText.Text = search == null ? (count == 1 ? "1 employee" : count + " employees")
+                                            : (count == 1 ? "1 match" : count + " matches");
+            bool empty = count == 0;
+            EmptyState.Visibility = empty ? Visibility.Visible : Visibility.Collapsed;
+            EmployeesList.Visibility = empty ? Visibility.Collapsed : Visibility.Visible;
+            if (!empty) return;
+
+            if (search != null)
+            {
+                EmptyTitle.Text = "No employee matches “" + search + "”";
+                EmptyHint.Text = "Check the spelling, or try just a first or last name.";
+                EmptyAction.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                EmptyTitle.Text = "No employees yet";
+                EmptyHint.Text = "Employees you add will show up here, ready to search and open.";
+                EmptyAction.Visibility = Visibility.Visible;
+            }
         }
 
-        private async void Refresh_Click(object sender, RoutedEventArgs e)
+        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            await LoadEmployeesAsync();
+            _searchDelay.Stop();
+            _searchDelay.Start();
         }
 
+        private async void Refresh_Click(object sender, RoutedEventArgs e) => await LoadEmployeesAsync(SearchBox.Text.Trim());
+
+        private void EmptyAction_Click(object sender, RoutedEventArgs e) => HubHelper.Find(this)?.SelectTab(0);
     }
 }

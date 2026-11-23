@@ -1,0 +1,49 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- 24x24 stroke icons. Colour follows the Foreground of the control they sit in. -->
+    <Style x:Key="Icon" TargetType="Path">
+        <Setter Property="Width" Value="24"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Stretch" Value="None"/>
+        <Setter Property="StrokeThickness" Value="1.8"/>
+        <Setter Property="StrokeLineJoin" Value="Round"/>
+        <Setter Property="StrokeStartLineCap" Value="Round"/>
+        <Setter Property="StrokeEndLineCap" Value="Round"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Stroke" Value="{Binding (TextElement.Foreground), RelativeSource={RelativeSource Self}}"/>
+    </Style>
+
+    <Geometry x:Key="IconHome">M3,11 L12,3 L21,11 M5,9.5 V20.5 H10 V14.5 H14 V20.5 H19 V9.5</Geometry>
+    <Geometry x:Key="IconStudent">M2,9 L12,4 L22,9 L12,14 Z M6,11.5 V16 C6,17.5 9,19 12,19 C15,19 18,17.5 18,16 V11.5 M22,9 V15</Geometry>
+    <Geometry x:Key="IconTeacher">M3,4 H21 V15 H3 Z M12,15 V20 M8,20 H16 M7,9.5 H13</Geometry>
+    <Geometry x:Key="IconEmployee">M4,8 H20 V20 H4 Z M9,8 V5 H15 V8 M4,13.5 H20</Geometry>
+    <Geometry x:Key="IconClass">M5,4 H18 C19,4 19.5,4.5 19.5,5.5 V20 H6 C4.8,20 4,19.2 4,18 V5 C4,4.4 4.4,4 5,4 Z M8,8.5 H15.5 M8,12 H15.5</Geometry>
+    <Geometry x:Key="IconSettings">M4,7 H13 M17,7 H20 M4,12 H7 M11,12 H20 M4,17 H12 M16,17 H20 M13,7 A2,2 0 1 0 17,7 A2,2 0 1 0 13,7 M7,12 A2,2 0 1 0 11,12 A2,2 0 1 0 7,12 M12,17 A2,2 0 1 0 16,17 A2,2 0 1 0 12,17</Geometry>
+    <Geometry x:Key="IconInfo">M3,12 A9,9 0 1 0 21,12 A9,9 0 1 0 3,12 M12,11 V16.5 M12,7.6 V7.7</Geometry>
+    <Geometry x:Key="IconSearch">M4,11 A7,7 0 1 0 18,11 A7,7 0 1 0 4,11 M16,16 L21,21</Geometry>
+    <Geometry x:Key="IconRefresh">M20,12 A8,8 0 1 1 17.7,6.3 M20,3.5 V8.5 H15</Geometry>
+    <Geometry x:Key="IconPlus">M12,5 V19 M5,12 H19</Geometry>
+    <Geometry x:Key="IconSun">M8,12 A4,4 0 1 0 16,12 A4,4 0 1 0 8,12 M12,2.5 V4.5 M12,19.5 V21.5 M2.5,12 H4.5 M19.5,12 H21.5 M5.3,5.3 L6.7,6.7 M17.3,17.3 L18.7,18.7 M5.3,18.7 L6.7,17.3 M17.3,6.7 L18.7,5.3</Geometry>
+    <Geometry x:Key="IconMoon">M20,14.5 A8.5,8.5 0 1 1 9.5,4 A6.5,6.5 0 0 0 20,14.5 Z</Geometry>
+    <Geometry x:Key="IconLogout">M10,4 H5 V20 H10 M15,8 L19,12 L15,16 M19,12 H9</Geometry>
+    <Geometry x:Key="IconUpload">M12,16 V4.5 M7,9 L12,4 L17,9 M4,16 V20 H20 V16</Geometry>
+    <Geometry x:Key="IconDownload">M12,4 V15.5 M7,11 L12,16 L17,11 M4,20 H20</Geometry>
+    <Geometry x:Key="IconEye">M2,12 C5,6 19,6 22,12 C19,18 5,18 2,12 Z M9,12 A3,3 0 1 0 15,12 A3,3 0 1 0 9,12</Geometry>
+    <Geometry x:Key="IconTrash">M4,7 H20 M9,7 V4 H15 V7 M6,7 L7,20 H17 L18,7 M10,11 V16 M14,11 V16</Geometry>
+    <Geometry x:Key="IconBack">M15,5 L8,12 L15,19</Geometry>
+    <Geometry x:Key="IconCalendar">M4,6 H20 V20 H4 Z M4,10.5 H20 M8,3 V8 M16,3 V8</Geometry>
+    <Geometry x:Key="IconChart">M4,20 V11 M10,20 V4 M16,20 V14 M2,20.5 H22</Geometry>
+    <Geometry x:Key="IconCheck">M5,12.5 L10,17.5 L19,7</Geometry>
+    <Geometry x:Key="IconClose">M6,6 L18,18 M18,6 L6,18</Geometry>
+    <Geometry x:Key="IconMinimize">M6,12 H18</Geometry>
+    <Geometry x:Key="IconMaximize">M6,6 H18 V18 H6 Z</Geometry>
+    <Geometry x:Key="IconRestore">M8,8 V5 H19 V16 H16 M5,8 H16 V19 H5 Z</Geometry>
+    <Geometry x:Key="IconDocument">M6,3 H14 L19,8 V21 H6 Z M14,3 V8 H19 M9,13 H16 M9,17 H16</Geometry>
+    <Geometry x:Key="IconEdit">M4,20 L5,15 L16,4 L20,8 L9,19 Z M14,6 L18,10</Geometry>
+    <Geometry x:Key="IconUser">M8,8 A4,4 0 1 0 16,8 A4,4 0 1 0 8,8 M4,21 C4,16.5 8,14.5 12,14.5 C16,14.5 20,16.5 20,21</Geometry>
+    <Geometry x:Key="IconLock">M6,11 H18 V20.5 H6 Z M8,11 V8 A4,4 0 0 1 16,8 V11</Geometry>
+    <Geometry x:Key="IconMail">M3,6 H21 V18 H3 Z M3,7 L12,13.5 L21,7</Geometry>
+    <Geometry x:Key="IconPhone">M7,3 H11 L12.5,8 L10,9.5 C11,12 13,14 15.5,15 L17,12.5 L21,14 V18 C21,19.5 19.5,21 18,21 C10,21 3,14 3,6 C3,4.5 5.5,3 7,3 Z</Geometry>
+    <Geometry x:Key="IconSchedule">M3,12 A9,9 0 1 0 21,12 A9,9 0 1 0 3,12 M12,7 V12 L15.5,14</Geometry>
+</ResourceDictionary>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -19,6 +19,7 @@ using EduTrack.ViewModel;
 using Microsoft.Win32;
 using MySql.Data.MySqlClient;
 using EduTrack.Data;
+using EduTrack.Utilities;
 
 namespace EduTrack.View
 {
@@ -40,34 +41,14 @@ namespace EduTrack.View
         {
             InitializeComponent();
 
-            DoubleAnimation fadeInAnimation = new DoubleAnimation
-            {
-                From = 0,
-                To = 1,
-                Duration = TimeSpan.FromSeconds(1)
-            };
-            ReminderMessage.BeginAnimation(TextBlock.OpacityProperty, fadeInAnimation);
-
-            System.Windows.Threading.DispatcherTimer timer = new System.Windows.Threading.DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(5);
-            timer.Tick += Timer_Tick;
-            timer.Start();
             LoadClasses();
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            DoubleAnimation fadeOutAnimation = new DoubleAnimation
-            {
-                From = 1,
-                To = 0,
-                Duration = TimeSpan.FromSeconds(1)
-            };
-            ReminderMessage.BeginAnimation(TextBlock.OpacityProperty, fadeOutAnimation);
-        }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            if (!FormValidation.Validate(this, txtFirstName, txtLastName, txtEmail)) return;
+
             try
             {
                 using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
@@ -94,7 +75,7 @@ namespace EduTrack.View
                         command.Parameters.AddWithValue("@gender", comboBoxGender.SelectedItem == null ? "" : comboBoxGender.SelectedItem.ToString());
                         command.Parameters.AddWithValue("@email", txtEmail.Text);
                         command.Parameters.AddWithValue("@phone", txtPhone.Text);
-                        command.Parameters.AddWithValue("@b_date", datePickerBirthDate.SelectedDate.GetValueOrDefault());
+                        command.Parameters.AddWithValue("@b_date", (object)datePickerBirthDate.SelectedDate ?? DBNull.Value);
                         command.Parameters.AddWithValue("@nationality", comboBoxNationality.SelectedItem == null ? "" : comboBoxNationality.SelectedItem.ToString());
                         command.Parameters.AddWithValue("@cin", txtCin.Text);
                         command.Parameters.AddWithValue("@address", txtAddress.Text);
@@ -102,7 +83,7 @@ namespace EduTrack.View
                         command.Parameters.AddWithValue("@cin_back_copy", uploadedFileName2);
                         command.Parameters.AddWithValue("@school_name", txtOrganization.Text);
                         command.Parameters.AddWithValue("@major", txtModule.Text);
-                        command.Parameters.AddWithValue("@j_date", Date_appointment.SelectedDate.GetValueOrDefault());
+                        command.Parameters.AddWithValue("@j_date", (object)Date_appointment.SelectedDate ?? DBNull.Value);
                         command.Parameters.AddWithValue("@high_degree", txtHighestDegree.Text);
                         command.Parameters.AddWithValue("@year_graduation", string.IsNullOrEmpty(txtYearGraduation.Text) ? 0 : int.Parse(txtYearGraduation.Text));
                         command.Parameters.AddWithValue("@university", txtUniversity.Text);
@@ -128,6 +109,7 @@ namespace EduTrack.View
                             SaveStudent(studentId, connection);
 
                             MessageBox.Show("Student information saved successfully!");
+                            HubHelper.Find(this)?.SelectTab(1);
                         }
                         else
                         {
@@ -264,8 +246,7 @@ namespace EduTrack.View
         {
             if (!string.IsNullOrEmpty(uploadedFileName1))
             {
-                DocumentViewerWindow documentViewer = new DocumentViewerWindow(uploadedFileName1);
-                documentViewer.ShowDialog();
+                DocumentViewerOverlay.Show(uploadedFileName1);
             }
         }
 
@@ -273,8 +254,7 @@ namespace EduTrack.View
         {
             if (!string.IsNullOrEmpty(uploadedFileName2))
             {
-                DocumentViewerWindow documentViewer = new DocumentViewerWindow(uploadedFileName2);
-                documentViewer.ShowDialog();
+                DocumentViewerOverlay.Show(uploadedFileName2);
             }
         }
 
@@ -282,8 +262,7 @@ namespace EduTrack.View
         {
             if (!string.IsNullOrEmpty(uploadedFileName3))
             {
-                DocumentViewerWindow documentViewer = new DocumentViewerWindow(uploadedFileName3);
-                documentViewer.ShowDialog();
+                DocumentViewerOverlay.Show(uploadedFileName3);
             }
         }
 
@@ -291,8 +270,7 @@ namespace EduTrack.View
         {
             if (!string.IsNullOrEmpty(uploadedFileName4))
             {
-                DocumentViewerWindow documentViewer = new DocumentViewerWindow(uploadedFileName4);
-                documentViewer.ShowDialog();
+                DocumentViewerOverlay.Show(uploadedFileName4);
             }
         }
 
@@ -300,8 +278,7 @@ namespace EduTrack.View
         {
             if (!string.IsNullOrEmpty(uploadedFileName5))
             {
-                DocumentViewerWindow documentViewer = new DocumentViewerWindow(uploadedFileName5);
-                documentViewer.ShowDialog();
+                DocumentViewerOverlay.Show(uploadedFileName5);
             }
         }
     }

@@ -1,272 +1,207 @@
-﻿using EduTrack.Models;
-using MySql.Data.MySqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using EduTrack.Data;
+using EduTrack.Models;
+using EduTrack.Utilities;
+using MySql.Data.MySqlClient;
 
 namespace EduTrack.View
 {
+    /// <summary>Weekly timetable for one class. Edit cells directly, then save the whole week at once.</summary>
     public partial class ClassesSchedule : UserControl
     {
+        private const int FirstHour = 7;
+        private const int LastHour = 19;
+
+        private bool _dirty;
+        private bool _switching;
+        private string _loadedClass;
+
         public ClassesSchedule()
         {
             InitializeComponent();
-            LoadClasses();
-            LoadSchedule();
+            scheduleDataGrid.ItemsSource = BlankWeek();
+            Loaded += async (s, e) => await LoadClassesAsync();
         }
 
-        private async void ClassComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private static List<ScheduleSlot> BlankWeek()
         {
-            if (comboBoxClass.SelectedItem != null)
-            {
-                string selectedClass = comboBoxClass.SelectedItem.ToString();
-                await LoadScheduleForClass(selectedClass);
-            }
-        }
-        private void LoadSchedule()
-        {
-            var scheduleSlots = new List<ScheduleSlot>();
-            for (int hour = 7; hour <= 19; hour++)
-            {
-                scheduleSlots.Add(new ScheduleSlot { TimeSlot = $"{hour}:00-{hour + 1}:00" });
-            }
-
-            scheduleDataGrid.ItemsSource = scheduleSlots;
+            var slots = new List<ScheduleSlot>();
+            for (int hour = FirstHour; hour <= LastHour; hour++)
+                slots.Add(new ScheduleSlot { TimeSlot = $"{hour}:00-{hour + 1}:00" });
+            return slots;
         }
 
-
-        private async Task LoadStudentsAsync(string className = null)
+        private void SetDirty(bool dirty)
         {
-            // Implementation needed
-            await Task.CompletedTask; // Placeholder to avoid warning
+            _dirty = dirty;
+            DirtyText.Visibility = dirty ? Visibility.Visible : Visibility.Collapsed;
+            SaveBtn.IsEnabled = dirty && comboBoxClass.SelectedItem != null;
         }
 
-        private async void LoadClasses()
+        private async Task LoadClassesAsync()
         {
-            string query = "SELECT ClassName FROM classes";
-
-            List<string> classNames = new List<string>();
-
-            try
-            {
-                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
-                {
-                    await connection.OpenAsync();
-                    using (MySqlCommand command = new MySqlCommand(query, connection))
-                    using (MySqlDataReader reader = await command.ExecuteReaderAsync() as MySqlDataReader)
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            string className = reader.GetString("ClassName");
-                            classNames.Add(className);
-                        }
-                    }
-                }
-
-                Dispatcher.Invoke(() =>
-                {
-                    comboBoxClass.ItemsSource = classNames;
-                });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private async Task LoadScheduleForClass(string className)
-        {
-            // Initialize a list to hold the complete schedule, including all time slots.
-            List<ScheduleSlot> completeSchedule = new List<ScheduleSlot>();
-            // First, populate this list with all time slots, leaving class-specific details empty for now.
-            for (int hour = 7; hour <= 19; hour++)
-            {
-                completeSchedule.Add(new ScheduleSlot { TimeSlot = $"{hour}:00-{hour + 1}:00" });
-            }
-
-            string query = $"SELECT cs.* FROM ClassSchedules cs JOIN classes c ON cs.ClassID = c.ClassID WHERE c.ClassName = @ClassName";
-
+            var names = new List<string>();
             try
             {
                 using (var connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
-                    using (var command = new MySqlCommand(query, connection))
+                    using (var command = new MySqlCommand("SELECT ClassName FROM classes ORDER BY ClassName", connection))
+                    using (var reader = (MySqlDataReader)await command.ExecuteReaderAsync())
                     {
-                        command.Parameters.AddWithValue("@ClassName", className);
-                        using (var reader = await command.ExecuteReaderAsync())
+                        while (await reader.ReadAsync()) names.Add(reader.GetString(0));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("The classes could not be loaded. Check that the database is running.\n" + ex.Message, "Can't load classes", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            comboBoxClass.ItemsSource = names;
+            EmptyState.Visibility = names.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            if (names.Count > 0) comboBoxClass.SelectedIndex = 0;
+        }
+
+        private async void ClassComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_switching) return;
+            string selected = comboBoxClass.SelectedItem as string;
+            if (selected == null) return;
+
+            if (_dirty && _loadedClass != null && selected != _loadedClass)
+            {
+                var answer = MessageBox.Show("You have unsaved changes to " + _loadedClass + ". Switch class and lose them?",
+                    "Unsaved changes", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (answer != MessageBoxResult.Yes)
+                {
+                    _switching = true;
+                    comboBoxClass.SelectedItem = _loadedClass;
+                    _switching = false;
+                    return;
+                }
+            }
+            await LoadScheduleForClass(selected);
+        }
+
+        private async Task LoadScheduleForClass(string className)
+        {
+            var week = BlankWeek();
+            try
+            {
+                using (var connection = DatabaseConnectionManager.CreateConnection())
+                {
+                    await connection.OpenAsync();
+                    const string sql = "SELECT cs.* FROM classschedules cs JOIN classes c ON cs.ClassID = c.ClassID WHERE c.ClassName = @n ORDER BY cs.ScheduleID";
+                    using (var command = new MySqlCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@n", className);
+                        using (var reader = (MySqlDataReader)await command.ExecuteReaderAsync())
                         {
                             while (await reader.ReadAsync())
                             {
-                                // Find the corresponding time slot in completeSchedule and update it with class-specific details.
-                                var timeSlot = reader.GetString(reader.GetOrdinal("TimeSlot"));
-                                var scheduleSlot = completeSchedule.FirstOrDefault(s => s.TimeSlot == timeSlot);
-                                if (scheduleSlot != null)
-                                {
-                                    scheduleSlot.ScheduleID = reader.GetInt32(reader.GetOrdinal("ScheduleID"));
-                                    scheduleSlot.Monday = reader.IsDBNull(reader.GetOrdinal("Monday")) ? null : reader.GetString(reader.GetOrdinal("Monday"));
-                                    scheduleSlot.Tuesday = reader.IsDBNull(reader.GetOrdinal("Tuesday")) ? null : reader.GetString(reader.GetOrdinal("Tuesday"));
-                                    scheduleSlot.Wednesday = reader.IsDBNull(reader.GetOrdinal("Wednesday")) ? null : reader.GetString(reader.GetOrdinal("Wednesday"));
-                                    scheduleSlot.Thursday = reader.IsDBNull(reader.GetOrdinal("Thursday")) ? null : reader.GetString(reader.GetOrdinal("Thursday"));
-                                    scheduleSlot.Friday = reader.IsDBNull(reader.GetOrdinal("Friday")) ? null : reader.GetString(reader.GetOrdinal("Friday"));
-                                    scheduleSlot.Saturday = reader.IsDBNull(reader.GetOrdinal("Saturday")) ? null : reader.GetString(reader.GetOrdinal("Saturday"));
-                                    scheduleSlot.Sunday = reader.IsDBNull(reader.GetOrdinal("Sunday")) ? null : reader.GetString(reader.GetOrdinal("Sunday"));
-                                }
+                                var slot = week.FirstOrDefault(s => s.TimeSlot == reader.Str("TimeSlot"));
+                                if (slot == null) continue;
+                                slot.ScheduleID = reader.GetInt32(reader.GetOrdinal("ScheduleID"));
+                                slot.Monday = reader.Str("Monday");
+                                slot.Tuesday = reader.Str("Tuesday");
+                                slot.Wednesday = reader.Str("Wednesday");
+                                slot.Thursday = reader.Str("Thursday");
+                                slot.Friday = reader.Str("Friday");
+                                slot.Saturday = reader.Str("Saturday");
+                                slot.Sunday = reader.Str("Sunday");
                             }
                         }
                     }
                 }
-
-                // Finally, set the complete schedule as the ItemsSource for the DataGrid.
-                scheduleDataGrid.ItemsSource = completeSchedule;
+                scheduleDataGrid.ItemsSource = week;
+                _loadedClass = className;
+                SetDirty(false);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("The schedule could not be loaded.\n" + ex.Message, "Can't load schedule", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private async Task InsertDataIntoDatabase(ScheduleSlot scheduleSlot, int classId)
+        private void scheduleDataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-            string query = @"INSERT INTO classschedules (ClassID, TimeSlot, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) 
-                     VALUES (@ClassID, @TimeSlot, @Monday, @Tuesday, @Wednesday, @Thursday, @Friday, @Saturday, @Sunday)";
-
-            using (var connection = DatabaseConnectionManager.CreateConnection())
-            {
-                await connection.OpenAsync();
-                using (var command = new MySqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@ClassID", classId);
-                    command.Parameters.AddWithValue("@TimeSlot", scheduleSlot.TimeSlot);
-                    command.Parameters.AddWithValue("@Monday", (object)scheduleSlot.Monday ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@Tuesday", (object)scheduleSlot.Tuesday ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@Wednesday", (object)scheduleSlot.Wednesday ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@Thursday", (object)scheduleSlot.Thursday ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@Friday", (object)scheduleSlot.Friday ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@Saturday", (object)scheduleSlot.Saturday ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@Sunday", (object)scheduleSlot.Sunday ?? DBNull.Value);
-                    await command.ExecuteNonQueryAsync();
-                }
-            }
-        }
-
-
-        private async void scheduleDataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
-        {
-            if (e.EditAction == DataGridEditAction.Commit)
-            {
-                var column = e.Column as DataGridTextColumn;
-                if (column != null)
-                {
-                    var bindingPath = (column.Binding as Binding).Path.Path;
-                    var textBox = e.EditingElement as TextBox;
-                    var newValue = textBox.Text;
-                    var scheduleSlot = e.Row.Item as ScheduleSlot;
-
-                    try
-                    {
-                        // Now you have the new value, the day of the week, and the time slot
-                        // You can use these to update your database
-                        await UpdateDatabase(scheduleSlot, bindingPath, newValue);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"An error occurred while updating the database: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                }
-            }
-        }
-
-        private async Task UpdateDatabase(ScheduleSlot scheduleSlot, string dayOfWeek, string newValue)
-        {
-            await Task.Yield(); // Placeholder to avoid warning
-                                // Future asynchronous database operations go here
-        }
-
-
-        private void AddScheduleEntry_Click(object sender, RoutedEventArgs e)
-        {
-            // Implementation remains the same as provided
+            if (e.EditAction == DataGridEditAction.Commit) SetDirty(true);
         }
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (comboBoxClass.SelectedItem is string selectedClassName)
+            scheduleDataGrid.CommitEdit(DataGridEditingUnit.Row, true);
+            string className = comboBoxClass.SelectedItem as string;
+            if (className == null)
             {
-                int classId = await GetClassIdByName(selectedClassName);
-                if (classId > 0)
-                {
-                    // Assuming you have a way to identify or collect all modified ScheduleSlots
-                    var modifiedScheduleSlots = scheduleDataGrid.SelectedItems.Cast<ScheduleSlot>().ToList();
-
-                    if (modifiedScheduleSlots.Any())
-                    {
-                        try
-                        {
-                            foreach (var scheduleSlot in modifiedScheduleSlots)
-                            {
-                                await InsertDataIntoDatabase(scheduleSlot, classId);
-                            }
-                            MessageBox.Show("Schedules updated successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                            await LoadScheduleForClass(selectedClassName); // Refresh the DataGrid
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"An error occurred while inserting data into the database: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("Please select at least one schedule slot to save.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Failed to find the selected class in the database.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                MessageBox.Show("Choose a class first.", "No class chosen", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
             }
-            else
-            {
-                MessageBox.Show("Please select a class.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
 
-
-        private async Task<int> GetClassIdByName(string className)
-        {
-            string query = "SELECT ClassID FROM classes WHERE ClassName = @ClassName LIMIT 1";
-
+            var slots = (scheduleDataGrid.ItemsSource as IEnumerable<ScheduleSlot>)?.ToList() ?? new List<ScheduleSlot>();
             try
             {
-                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
+                using (var connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
-                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    int classId;
+                    using (var idCommand = new MySqlCommand("SELECT ClassID FROM classes WHERE ClassName = @n LIMIT 1", connection))
                     {
-                        command.Parameters.AddWithValue("@ClassName", className);
+                        idCommand.Parameters.AddWithValue("@n", className);
+                        object result = await idCommand.ExecuteScalarAsync();
+                        if (result == null) throw new InvalidOperationException("The class no longer exists.");
+                        classId = Convert.ToInt32(result);
+                    }
 
-                        object result = await command.ExecuteScalarAsync();
-                        if (result != null)
+                    // Rewrite the week in one go: removes old duplicates and keeps empty hours out of the table.
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        using (var delete = new MySqlCommand("DELETE FROM classschedules WHERE ClassID = @c", connection, transaction))
                         {
-                            return Convert.ToInt32(result);
+                            delete.Parameters.AddWithValue("@c", classId);
+                            await delete.ExecuteNonQueryAsync();
                         }
+                        foreach (var slot in slots.Where(HasAnyContent))
+                        {
+                            const string insert = "INSERT INTO classschedules (ClassID, TimeSlot, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) " +
+                                                  "VALUES (@c, @t, @mo, @tu, @we, @th, @fr, @sa, @su)";
+                            using (var command = new MySqlCommand(insert, connection, transaction))
+                            {
+                                command.Parameters.AddWithValue("@c", classId);
+                                command.Parameters.AddWithValue("@t", slot.TimeSlot);
+                                command.Parameters.AddWithValue("@mo", Clean(slot.Monday));
+                                command.Parameters.AddWithValue("@tu", Clean(slot.Tuesday));
+                                command.Parameters.AddWithValue("@we", Clean(slot.Wednesday));
+                                command.Parameters.AddWithValue("@th", Clean(slot.Thursday));
+                                command.Parameters.AddWithValue("@fr", Clean(slot.Friday));
+                                command.Parameters.AddWithValue("@sa", Clean(slot.Saturday));
+                                command.Parameters.AddWithValue("@su", Clean(slot.Sunday));
+                                await command.ExecuteNonQueryAsync();
+                            }
+                        }
+                        transaction.Commit();
                     }
                 }
+                SetDirty(false);
+                MessageBox.Show("Schedule saved for " + className + ".");
+                await LoadScheduleForClass(className);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An error occurred while retrieving the class ID: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("The schedule could not be saved.\n" + ex.Message, "Couldn't save", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            return -1;
         }
 
+        private static bool HasAnyContent(ScheduleSlot s) =>
+            new[] { s.Monday, s.Tuesday, s.Wednesday, s.Thursday, s.Friday, s.Saturday, s.Sunday }.Any(v => !string.IsNullOrWhiteSpace(v));
+
+        private static object Clean(string value) => string.IsNullOrWhiteSpace(value) ? (object)DBNull.Value : value.Trim();
     }
 }

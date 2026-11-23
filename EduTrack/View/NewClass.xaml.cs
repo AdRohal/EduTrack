@@ -1,96 +1,97 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using MySql.Data.MySqlClient;
 using EduTrack.Data;
+using EduTrack.Utilities;
+using MySql.Data.MySqlClient;
 
 namespace EduTrack.View
 {
-    /// <summary>
-    /// Interaction logic for NewClass.xaml
-    /// </summary>
     public partial class NewClass : UserControl
     {
         public NewClass()
         {
             InitializeComponent();
+            datePickerCreateDate.SelectedDate = DateTime.Today;
             UpdateLastClass();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(txtClassName.Text))
+            {
+                FormError.Text = "Give the class a name.";
+                txtClassName.Focus();
+                return;
+            }
+            FormError.Text = string.Empty;
+
             try
             {
                 using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     connection.Open();
 
-                    string sql = @"INSERT INTO classes
-                    (ClassName, major, Description, CreatedDate)
-                    VALUES 
-                    (@ClassName, @major, @Description, @CreatedDate)";
-
+                    string sql = "INSERT INTO classes (ClassName, major, Description, CreatedDate) VALUES (@ClassName, @major, @Description, @CreatedDate)";
                     using (MySqlCommand command = new MySqlCommand(sql, connection))
                     {
-                        command.Parameters.AddWithValue("@ClassName", txtClassName.Text);
-                        command.Parameters.AddWithValue("@major", txtMajor.Text);
-                        command.Parameters.AddWithValue("@Description", txtDescription.Text);
-                        command.Parameters.AddWithValue("@CreatedDate", datePickerCreateDate.SelectedDate.GetValueOrDefault());
+                        command.Parameters.AddWithValue("@ClassName", txtClassName.Text.Trim());
+                        command.Parameters.AddWithValue("@major", txtMajor.Text.Trim());
+                        command.Parameters.AddWithValue("@Description", txtDescription.Text.Trim());
+                        command.Parameters.AddWithValue("@CreatedDate", (object)datePickerCreateDate.SelectedDate ?? DBNull.Value);
 
-                        int rowsAffected = command.ExecuteNonQuery();
-
-                        if (rowsAffected > 0)
+                        if (command.ExecuteNonQuery() > 0)
                         {
-                            MessageBox.Show("Class information saved successfully!");
+                            MessageBox.Show("Class saved successfully.");
+                            txtClassName.Clear();
+                            txtMajor.Clear();
+                            txtDescription.Clear();
+                            datePickerCreateDate.SelectedDate = DateTime.Today;
                             UpdateLastClass();
+                            txtClassName.Focus();
                         }
                         else
                         {
-                            MessageBox.Show("Failed to save class information!");
+                            MessageBox.Show("The class could not be saved.", "Couldn't save", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("An error occurred: " + ex.Message);
+                MessageBox.Show("The class could not be saved.\n" + ex.Message, "Couldn't save", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         public void UpdateLastClass()
         {
-            string sql = "SELECT * FROM classes ORDER BY ClassID DESC LIMIT 1";
-
             try
             {
                 using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     connection.Open();
-
-                    using (MySqlCommand command = new MySqlCommand(sql, connection))
+                    using (var command = new MySqlCommand("SELECT ClassName, major, Description, CreatedDate FROM classes ORDER BY ClassID DESC LIMIT 1", connection))
+                    using (var reader = command.ExecuteReader())
                     {
-                        using (MySqlDataReader reader = command.ExecuteReader())
+                        if (reader.Read())
                         {
-                            if (reader.Read())
-                            {
-                                string className = reader["ClassName"].ToString();
-                                string major = reader["major"].ToString();
-                                string description = reader["Description"].ToString();
-                                string createdDate = ((DateTime)reader["CreatedDate"]).ToString("g");
-
-                                txtLastClass.Text = $"Name: {className}\nMajor: {major}\nDescription: {description}\nCreated Date: {createdDate}";
-                            }
-                            else
-                            {
-                                txtLastClass.Text = "No Class Found";
-                            }
+                            string major = reader["major"] as string;
+                            string description = reader["Description"] as string;
+                            string created = reader["CreatedDate"] is DateTime d ? d.ToString("d MMM yyyy") : "no date";
+                            txtLastClass.Text = reader["ClassName"] + "\n" +
+                                                (string.IsNullOrWhiteSpace(major) ? "No major" : "Major: " + major) + ", started " + created +
+                                                (string.IsNullOrWhiteSpace(description) ? "" : "\n" + description);
+                        }
+                        else
+                        {
+                            txtLastClass.Text = "No class has been added yet. The one you save will appear here.";
                         }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                txtLastClass.Text = "Error loading last class";
+                txtLastClass.Text = "The last class could not be loaded.";
             }
         }
     }

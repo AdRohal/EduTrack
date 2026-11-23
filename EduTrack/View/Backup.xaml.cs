@@ -1,24 +1,35 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Data.SqlClient;
-using System.Xml;
-using MySql.Data.MySqlClient;
-using Microsoft.Win32;
-using System.Linq;
-using System.Collections.Generic;
 using EduTrack.Data;
+using Microsoft.Win32;
+using MySql.Data.MySqlClient;
 
 namespace EduTrack.View
 {
-    /// <summary>
-    /// Interaction logic for Backup.xaml
-    /// </summary>
+    /// <summary>Export a list to XML and restore it later. Only the three people tables can be exported or restored.</summary>
     public partial class Backup : UserControl
     {
+        private static readonly Dictionary<string, string> Tables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "Students", "student_registry" },
+            { "Teachers", "teacher_registry" },
+            { "Employees", "employee_registry" }
+        };
+
+        // Older versions wrote <StudentData><Student>...; map those root names too.
+        private static readonly Dictionary<string, string> LegacyNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "Student", "student_registry" }, { "Teacher", "teacher_registry" }, { "Employee", "employee_registry" }
+        };
+
         private string filePath;
+        private string lastExport;
 
         public Backup()
         {
@@ -27,261 +38,151 @@ namespace EduTrack.View
 
         private void downloadButton_Click(object sender, RoutedEventArgs e)
         {
-            string selectedTable = ((ComboBoxItem)comboBox1.SelectedItem).Content.ToString().ToLower();
-            switch (selectedTable)
+            string label = (comboBox1.SelectedItem as ComboBoxItem)?.Content?.ToString();
+            if (label == null || !Tables.TryGetValue(label, out string table))
             {
-                case "teacher":
-                    DownloadTeacherData();
-                    break;
-                case "employee":
-                    DownloadEmployeeData();
-                    break;
-                case "student":
-                    DownloadStudentData();
-                    break;
-                default:
-                    MessageBox.Show("Please select a valid option.");
-                    break;
+                MessageBox.Show("Choose what to save first.", "Nothing chosen", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
             }
-        }
 
-        private void DownloadTeacherData()
-        {
-            string query = "SELECT * FROM teacher_registry";
-
-            using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
+            var dialog = new SaveFileDialog
             {
-                try
+                Title = "Save " + label.ToLower(),
+                Filter = "XML files (*.xml)|*.xml",
+                FileName = table + "-" + DateTime.Now.ToString("yyyy-MM-dd") + ".xml",
+                InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EduTrack")
+            };
+            if (dialog.ShowDialog() != true) return;
+
+            try
+            {
+                var data = new DataTable(table);
+                using (var connection = DatabaseConnectionManager.CreateConnection())
                 {
                     connection.Open();
-
-                    MySqlDataAdapter adapter = new MySqlDataAdapter(query, connection);
-
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
-
-                    string directoryPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EduTrack", "Back UP");
-
-                    Directory.CreateDirectory(directoryPath);
-
-                    string path = Path.Combine(directoryPath, "teacher_registry.xml");
-
-                    using (StreamWriter outputFile = new StreamWriter(path))
-                    {
-                        outputFile.WriteLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-                        outputFile.WriteLine("<TeacherData>");
-
-                        foreach (DataRow row in dt.Rows)
-                        {
-                            outputFile.WriteLine("\t<Teacher>");
-                            foreach (DataColumn column in dt.Columns)
-                            {
-                                string value = row[column].ToString();
-                                if (column.DataType == typeof(DateTime))
-                                {
-                                    DateTime date;
-                                    if (DateTime.TryParse(value, out date))
-                                    {
-                                        value = date.ToString("yyyy-MM-dd");
-                                    }
-                                }
-                                outputFile.WriteLine($"\t\t<{column.ColumnName}>{value}</{column.ColumnName}>");
-                            }
-                            outputFile.WriteLine("\t</Teacher>");
-                        }
-
-                        outputFile.WriteLine("</TeacherData>");
-                    }
-
-                    MessageBox.Show("Teacher data has been downloaded as XML.");
+                    new MySqlDataAdapter("SELECT * FROM " + table, connection).Fill(data);
                 }
-                catch (MySqlException ex)
-                {
-                    MessageBox.Show("An error occurred while connecting to the database: " + ex.Message);
-                }
+                data.WriteXml(dialog.FileName, XmlWriteMode.WriteSchema);
+
+                lastExport = dialog.FileName;
+                ExportResultText.Text = data.Rows.Count + (data.Rows.Count == 1 ? " record saved" : " records saved");
+                ExportResult.Visibility = Visibility.Visible;
             }
-        }
-
-        private void DownloadEmployeeData()
-        {
-            string query = "SELECT * FROM employee_registry";
-
-            using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
+            catch (Exception ex)
             {
-                try
-                {
-                    connection.Open();
-
-                    MySqlDataAdapter adapter = new MySqlDataAdapter(query, connection);
-
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
-
-                    string directoryPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EduTrack", "Back UP");
-
-                    Directory.CreateDirectory(directoryPath);
-
-                    string path = Path.Combine(directoryPath, "employee_registry.xml");
-
-                    using (StreamWriter outputFile = new StreamWriter(path))
-                    {
-                        outputFile.WriteLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-                        outputFile.WriteLine("<EmployeeData>");
-
-                        foreach (DataRow row in dt.Rows)
-                        {
-                            outputFile.WriteLine("\t<Employee>");
-                            foreach (DataColumn column in dt.Columns)
-                            {
-                                string value = row[column].ToString();
-                                if (column.DataType == typeof(DateTime))
-                                {
-                                    DateTime date;
-                                    if (DateTime.TryParse(value, out date))
-                                    {
-                                        value = date.ToString("yyyy-MM-dd");
-                                    }
-                                }
-                                outputFile.WriteLine($"\t\t<{column.ColumnName}>{value}</{column.ColumnName}>");
-                            }
-                            outputFile.WriteLine("\t</Employee>");
-                        }
-
-                        outputFile.WriteLine("</EmployeeData>");
-                    }
-
-                    MessageBox.Show("Employee data has been downloaded as XML.");
-                }
-                catch (MySqlException ex)
-                {
-                    MessageBox.Show("An error occurred while connecting to the database: " + ex.Message);
-                }
+                MessageBox.Show("The file could not be saved.\n" + ex.Message, "Couldn't save", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void DownloadStudentData()
+        private void ShowFolder_Click(object sender, RoutedEventArgs e)
         {
-            string query = "SELECT * FROM student_registry";
-
-            using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
-            {
-                try
-                {
-                    connection.Open();
-
-                    MySqlDataAdapter adapter = new MySqlDataAdapter(query, connection);
-
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
-
-                    string directoryPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EduTrack", "Back UP");
-
-                    Directory.CreateDirectory(directoryPath);
-
-                    string path = Path.Combine(directoryPath, "student_registry.xml");
-
-                    using (StreamWriter outputFile = new StreamWriter(path))
-                    {
-                        outputFile.WriteLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-                        outputFile.WriteLine("<StudentData>");
-
-                        foreach (DataRow row in dt.Rows)
-                        {
-                            outputFile.WriteLine("\t<Student>");
-                            foreach (DataColumn column in dt.Columns)
-                            {
-                                string value = row[column].ToString();
-                                if (column.DataType == typeof(DateTime))
-                                {
-                                    DateTime date;
-                                    if (DateTime.TryParse(value, out date))
-                                    {
-                                        value = date.ToString("yyyy-MM-dd");
-                                    }
-                                }
-                                outputFile.WriteLine($"\t\t<{column.ColumnName}>{value}</{column.ColumnName}>");
-                            }
-                            outputFile.WriteLine("\t</Student>");
-                        }
-
-                        outputFile.WriteLine("</StudentData>");
-                    }
-
-                    MessageBox.Show("Student data has been downloaded as XML.");
-                }
-                catch (MySqlException ex)
-                {
-                    MessageBox.Show("An error occurred while connecting to the database: " + ex.Message);
-                }
-            }
+            if (lastExport != null && File.Exists(lastExport))
+                Process.Start("explorer.exe", "/select,\"" + lastExport + "\"");
         }
+
         private void uploadButton_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "XML files (*.xml)|*.xml";
+            var openFileDialog = new OpenFileDialog { Filter = "XML files (*.xml)|*.xml", Title = "Choose a saved copy" };
             if (openFileDialog.ShowDialog() == true)
             {
                 filePath = openFileDialog.FileName;
                 fileNameTextBlock.Text = Path.GetFileName(filePath);
+                importButton.IsEnabled = true;
             }
         }
+
         private void importButton_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(filePath))
             {
-                MessageBox.Show("Please select a file to import.");
+                MessageBox.Show("Choose a file to restore first.", "No file chosen", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
-            string tableName = Path.GetFileNameWithoutExtension(filePath);
-
-            DataSet ds = new DataSet();
-            ds.ReadXml(filePath);
-
-            using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
+            var dataSet = new DataSet();
+            try { dataSet.ReadXml(filePath); }
+            catch (Exception ex)
             {
-                try
+                MessageBox.Show("That file isn't a readable EduTrack copy.\n" + ex.Message, "Can't read the file", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            if (dataSet.Tables.Count == 0 || dataSet.Tables[0].Rows.Count == 0)
+            {
+                MessageBox.Show("That file has no records to restore.", "Nothing to restore", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            DataTable source = dataSet.Tables[0];
+            string table = ResolveTable(source.TableName, Path.GetFileNameWithoutExtension(filePath));
+            if (table == null)
+            {
+                MessageBox.Show("EduTrack can only restore students, teachers or employees saved with the Save a copy button.",
+                    "Unknown file", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var confirm = MessageBox.Show("Restore " + source.Rows.Count + " records into " + table.Replace("_registry", "") + "s? Records with the same ID will be replaced.",
+                "Restore data", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (confirm != MessageBoxResult.Yes) return;
+
+            try
+            {
+                using (var connection = DatabaseConnectionManager.CreateConnection())
                 {
                     connection.Open();
 
-                    DataTable dt = ds.Tables[0];
-                    foreach (DataRow row in dt.Rows)
-                    {
-                        var values = new List<string>();
-                        foreach (var item in row.ItemArray)
-                        {
-                            string value;
-                            if (item is DBNull)
-                            {
-                                value = "NULL";
-                            }
-                            else
-                            {
-                                value = item.ToString().Replace("'", "''");
-                                value = value.Replace("\\", "\\\\");
-                                value = $"'{value}'";
-                            }
-                            values.Add(value);
-                        }
+                    // Only columns that really exist in the table are written; the table name never comes from the file.
+                    var known = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    using (var schema = new MySqlCommand("SELECT * FROM " + table + " LIMIT 0", connection))
+                    using (var reader = schema.ExecuteReader())
+                        for (int i = 0; i < reader.FieldCount; i++) known.Add(reader.GetName(i));
 
-                        string query = $"INSERT INTO {tableName} ({string.Join(", ", dt.Columns.Cast<DataColumn>().Select(c => $"`{c.ColumnName}`"))}) VALUES ({string.Join(", ", values)})";
-                        MySqlCommand command = new MySqlCommand(query, connection);
-                        command.ExecuteNonQuery();
-                    }
-                    MessageBox.Show("Data has been imported successfully.");
-                }
-                catch (MySqlException ex)
-                {
-                    MessageBox.Show("An error occurred while connecting to the database: " + ex.Message);
-                }
-                finally
-                {
-                    if (connection.State == ConnectionState.Open)
+                    var columns = source.Columns.Cast<DataColumn>().Where(c => known.Contains(c.ColumnName)).Select(c => c.ColumnName).ToList();
+                    if (columns.Count == 0)
                     {
-                        connection.Close();
+                        MessageBox.Show("None of the columns in that file match the " + table + " table.", "Can't restore", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
+                    string sql = "INSERT INTO " + table + " (" + string.Join(", ", columns.Select(c => "`" + c + "`")) + ") VALUES (" +
+                                 string.Join(", ", columns.Select((c, i) => "@p" + i)) + ") ON DUPLICATE KEY UPDATE " +
+                                 string.Join(", ", columns.Select(c => "`" + c + "` = VALUES(`" + c + "`)"));
+
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        foreach (DataRow row in source.Rows)
+                        {
+                            using (var command = new MySqlCommand(sql, connection, transaction))
+                            {
+                                for (int i = 0; i < columns.Count; i++)
+                                {
+                                    object value = row[columns[i]];
+                                    command.Parameters.AddWithValue("@p" + i, value == null || value is DBNull ? DBNull.Value : value);
+                                }
+                                command.ExecuteNonQuery();
+                            }
+                        }
+                        transaction.Commit();
                     }
                 }
+                MessageBox.Show(source.Rows.Count + " records were restored successfully.");
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Nothing was changed. The restore stopped because:\n" + ex.Message, "Couldn't restore", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private static string ResolveTable(string xmlTableName, string fileName)
+        {
+            foreach (var candidate in new[] { xmlTableName, fileName })
+            {
+                if (candidate == null) continue;
+                foreach (var table in Tables.Values)
+                    if (candidate.StartsWith(table, StringComparison.OrdinalIgnoreCase)) return table;
+                if (LegacyNames.TryGetValue(candidate, out string legacy)) return legacy;
+            }
+            return null;
         }
     }
 }

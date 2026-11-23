@@ -1,342 +1,244 @@
-﻿using EduTrack.Models;
-using MySql.Data.MySqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data.SqlClient;
+using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using EduTrack.Data;
+using EduTrack.Models;
+using EduTrack.Utilities;
+using MySql.Data.MySqlClient;
 
 namespace EduTrack.View
 {
+    /// <summary>Enter each student's grade for one module of one class.</summary>
     public partial class ClassesGrades : UserControl
     {
+        private const string GradeRule = "Use a number from 0 to 20, or a short word such as ABS.";
+
         public ClassesGrades()
         {
             InitializeComponent();
-            Loaded += ClassesGrades_Loaded;
+            Loaded += async (s, e) => await PopulateClassesComboBox();
         }
 
-        private async void ClassesGrades_Loaded(object sender, RoutedEventArgs e)
+        public class Student
         {
-            await PopulateClassesComboBox();
+            public int StudentID { get; set; }
+            public string FullName { get; set; }
+            public string Grade { get; set; }
+        }
+
+        private void SetEmpty(string title, string text)
+        {
+            EmptyTitle.Text = title;
+            EmptyText.Text = text;
         }
 
         private async Task PopulateClassesComboBox()
         {
-            string query = "SELECT ClassID, ClassName FROM classes";
-            List<ClassInfo> classInfoList = new List<ClassInfo>();
+            var classes = new List<ClassInfo>();
+            try
+            {
+                using (var connection = DatabaseConnectionManager.CreateConnection())
+                {
+                    await connection.OpenAsync();
+                    using (var command = new MySqlCommand("SELECT ClassID, ClassName FROM classes ORDER BY ClassName", connection))
+                    using (var reader = (MySqlDataReader)await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                            classes.Add(new ClassInfo { ClassID = reader.GetInt32(0), ClassName = reader.GetString(1) });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("The classes could not be loaded. Check that the database is running.\n" + ex.Message, "Can't load classes", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            classesComboBox.ItemsSource = classes;
+            classesComboBox.DisplayMemberPath = "ClassName";
+            classesComboBox.SelectedValuePath = "ClassID";
+            if (classes.Count == 0) SetEmpty("No classes yet", "Create a class first, add students to it, then come back to grade them.");
+            else classesComboBox.SelectedIndex = 0;
+        }
+
+        private async void classesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (classesComboBox.SelectedValue is int classId) await PopulateModuleComboBox(classId);
+        }
+
+        private async Task PopulateModuleComboBox(int classId)
+        {
+            var modules = new List<Module>();
+            try
+            {
+                using (var connection = DatabaseConnectionManager.CreateConnection())
+                {
+                    await connection.OpenAsync();
+                    using (var command = new MySqlCommand("SELECT ModuleID, ModuleName FROM modules WHERE ClassID = @c ORDER BY ModuleName", connection))
+                    {
+                        command.Parameters.AddWithValue("@c", classId);
+                        using (var reader = (MySqlDataReader)await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                                modules.Add(new Module { ModuleID = reader.GetInt32(0), ModuleName = reader.GetString(1) });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("The modules could not be loaded.\n" + ex.Message, "Can't load modules", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            ModuleComboBox.ItemsSource = modules;
+            ModuleComboBox.DisplayMemberPath = "ModuleName";
+            ModuleComboBox.SelectedValuePath = "ModuleID";
+            if (modules.Count == 0)
+            {
+                studentsDataGrid.ItemsSource = null;
+                SetEmpty("This class has no modules yet", "Add one with the box on the right (for example Algebra), then enter grades here.");
+            }
+            else
+            {
+                ModuleComboBox.SelectedIndex = 0;
+            }
+        }
+
+        private async void ModuleComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ModuleComboBox.SelectedValue is int moduleId) await LoadStudentsAndGradesForSelectedModule(moduleId);
+        }
+
+        /// <summary>Every student of the module's class, with their grade if one has been saved.</summary>
+        private async Task LoadStudentsAndGradesForSelectedModule(int moduleId)
+        {
+            var students = new List<Student>();
+            const string query = @"
+SELECT sr.StudentID, CONCAT(sr.f_name, ' ', sr.l_name) AS FullName, sm.Grade
+FROM modules m
+JOIN studentclasses sc ON sc.ClassID = m.ClassID
+JOIN student_registry sr ON sr.StudentID = sc.StudentID
+LEFT JOIN student_module sm ON sm.StudentID = sr.StudentID AND sm.ModuleID = m.ModuleID
+WHERE m.ModuleID = @ModuleID
+ORDER BY sr.l_name, sr.f_name";
+            try
+            {
+                using (var connection = DatabaseConnectionManager.CreateConnection())
+                {
+                    await connection.OpenAsync();
+                    using (var command = new MySqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@ModuleID", moduleId);
+                        using (var reader = (MySqlDataReader)await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                                students.Add(new Student { StudentID = reader.GetInt32(0), FullName = reader.GetString(1), Grade = reader.Str("Grade") ?? "" });
+                        }
+                    }
+                }
+                studentsDataGrid.ItemsSource = students;
+                if (students.Count == 0) SetEmpty("No students in this class yet", "Add students to the class from All classes, then grade them here.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("The students could not be loaded.\n" + ex.Message, "Can't load students", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void AddModuleButton_Click(object sender, RoutedEventArgs e)
+        {
+            string moduleName = moduleNameTextBox.Text.Trim();
+            if (!(classesComboBox.SelectedValue is int classId) || moduleName.Length == 0)
+            {
+                MessageBox.Show("Choose a class and type the name of the module first.", "Module not added", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
             try
             {
                 using (var connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
-                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    using (var command = new MySqlCommand("INSERT INTO modules (ModuleName, ClassID) VALUES (@n, @c)", connection))
                     {
-                        // Fix for Problem 1 & 2: Explicit cast to MySqlDataReader
-                        using (MySqlDataReader reader = (MySqlDataReader)await command.ExecuteReaderAsync())
-                        {
-                            while (await reader.ReadAsync())
-                            {
-                                classInfoList.Add(new ClassInfo
-                                {
-                                    ClassID = reader.GetInt32("ClassID"),
-                                    ClassName = reader.GetString("ClassName")
-                                });
-                            }
-                        }
+                        command.Parameters.AddWithValue("@n", moduleName);
+                        command.Parameters.AddWithValue("@c", classId);
+                        await command.ExecuteNonQueryAsync();
                     }
                 }
-
-                classesComboBox.ItemsSource = classInfoList;
-                classesComboBox.DisplayMemberPath = "ClassName";
-                classesComboBox.SelectedValuePath = "ClassID";
+                MessageBox.Show("Module added successfully.");
+                moduleNameTextBox.Clear();
+                await PopulateModuleComboBox(classId);
+                ModuleComboBox.SelectedIndex = ModuleComboBox.Items.Count - 1;   // jump to the module just added
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private async void classesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (classesComboBox.SelectedValue is int selectedClassId)
-            {
-                await PopulateModuleComboBox(selectedClassId);
-                await LoadStudentsForClass(selectedClassId);
-            }
-        }
-
-
-        private async Task PopulateModuleComboBox(int classId)
-        {
-            string query = $"SELECT ModuleID, ModuleName FROM modules WHERE ClassID = {classId}";
-            List<Module> moduleList = new List<Module>();
-
-            try
-            {
-                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
-                {
-                    await connection.OpenAsync();
-                    using (MySqlCommand command = new MySqlCommand(query, connection))
-                    {
-                        // Fix for Problem 1 & 2: Explicit cast to MySqlDataReader
-                        using (MySqlDataReader reader = (MySqlDataReader)await command.ExecuteReaderAsync())
-                        {
-                            while (await reader.ReadAsync())
-                            {
-                                moduleList.Add(new Module
-                                {
-                                    ModuleID = reader.GetInt32("ModuleID"),
-                                    ModuleName = reader.GetString("ModuleName")
-                                });
-                            }
-                        }
-                    }
-                }
-
-                ModuleComboBox.ItemsSource = moduleList;
-                ModuleComboBox.DisplayMemberPath = "ModuleName";
-                ModuleComboBox.SelectedValuePath = "ModuleID";
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private async void ModuleComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (ModuleComboBox.SelectedValue is int selectedModuleId)
-            {
-                await LoadStudentsForModule(selectedModuleId);
-                await LoadStudentsAndGradesForSelectedModule(selectedModuleId);
-            }
-        }
-
-        public class Student
-        {
-            public int StudentID { get; set; } // Ensure this property exists
-            public string FullName { get; set; } // Ensure this property exists
-            public string Grade { get; set; } // Ensure this property exists
-        }
-
-        private async Task LoadStudentsForModule(int moduleId)
-        {
-            await Task.Delay(1000);
-        }
-
-        private async Task LoadStudentsForClass(int classId)
-        {
-            List<Student> students = new List<Student>();
-            string query = @"
-SELECT sr.StudentID, CONCAT(sr.f_name, ' ', sr.l_name) AS FullName
-FROM student_registry sr
-JOIN studentclasses sc ON sr.StudentID = sc.StudentID
-WHERE sc.ClassID = @ClassID";
-
-            try
-            {
-                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
-                {
-                    await connection.OpenAsync();
-                    using (MySqlCommand command = new MySqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@ClassID", classId);
-
-                        using (MySqlDataReader reader = (MySqlDataReader)await command.ExecuteReaderAsync())
-                        {
-                            while (await reader.ReadAsync())
-                            {
-                                students.Add(new Student
-                                {
-                                    StudentID = reader.GetInt32("StudentID"),
-                                    FullName = reader.GetString("FullName")
-                                });
-                            }
-                        }
-
-                    }
-                }
-
-                studentsDataGrid.ItemsSource = students;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private async Task LoadStudentsAndGradesForSelectedModule(int moduleId)
-        {
-            List<Student> students = new List<Student>();
-            string query = @"
-SELECT sr.StudentID, CONCAT(sr.f_name, ' ', sr.l_name) AS FullName, sm.Grade
-FROM student_registry sr
-LEFT JOIN student_module sm ON sr.StudentID = sm.StudentID AND sm.ModuleID = @ModuleID
-WHERE sr.StudentID IN (
-    SELECT StudentID
-    FROM student_module
-    WHERE ModuleID = @ModuleID
-)
-ORDER BY FullName";
-
-            try
-            {
-                using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
-                {
-                    await connection.OpenAsync();
-                    using (MySqlCommand command = new MySqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@ModuleID", moduleId);
-
-                        using (var reader = await command.ExecuteReaderAsync())
-                        {
-                            while (await reader.ReadAsync())
-                            {
-                                var student = new Student
-                                {
-                                    // Use column indices
-                                    StudentID = reader.GetInt32(0), // Assuming StudentID is the first column
-                                    FullName = reader.GetString(1), // Assuming FullName is the second column
-                                    Grade = reader.IsDBNull(2) ? "" : reader.GetString(2) // Assuming Grade is the third column
-                                };
-                                students.Add(student);
-                            }
-                        }
-                    }
-                }
-
-                studentsDataGrid.ItemsSource = students;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-
-
-
-
-
-
-        private async void AddModuleButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (classesComboBox.SelectedValue is int selectedClassId && !string.IsNullOrWhiteSpace(moduleNameTextBox.Text))
-            {
-                var moduleName = moduleNameTextBox.Text.Trim();
-                try
-                {
-                    using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
-                    {
-                        await connection.OpenAsync();
-                        string query = "INSERT INTO modules (ModuleName, ClassID) VALUES (@ModuleName, @ClassID)";
-
-                        using (MySqlCommand command = new MySqlCommand(query, connection))
-                        {
-                            command.Parameters.AddWithValue("@ModuleName", moduleName);
-                            command.Parameters.AddWithValue("@ClassID", selectedClassId);
-
-                            int result = await command.ExecuteNonQueryAsync();
-                            if (result > 0)
-                            {
-                                MessageBox.Show("Module added successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                                moduleNameTextBox.Clear();
-                                await PopulateModuleComboBox(selectedClassId);
-                            }
-                            else
-                            {
-                                MessageBox.Show("Failed to add the module.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-            else
-            {
-                MessageBox.Show("Please select a class and enter a module name.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("The module could not be added.\n" + ex.Message, "Couldn't add", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private async void SaveGradeButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ModuleComboBox.SelectedValue is int selectedModuleId)
+            studentsDataGrid.CommitEdit(DataGridEditingUnit.Row, true);
+            if (!(ModuleComboBox.SelectedValue is int moduleId))
             {
-                foreach (var item in studentsDataGrid.Items)
+                MessageBox.Show("Choose a module first.", "No module chosen", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var students = (studentsDataGrid.ItemsSource as IEnumerable<Student>)?.ToList() ?? new List<Student>();
+            foreach (var student in students)
+            {
+                if (!IsValidGrade(student.Grade))
                 {
-                    // Check if the item is of type Student before casting
-                    if (item is Student student)
+                    MessageBox.Show("The grade for " + student.FullName + " isn't valid. " + GradeRule, "Check the grades", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+            }
+
+            try
+            {
+                using (var connection = DatabaseConnectionManager.CreateConnection())
+                {
+                    await connection.OpenAsync();
+                    using (var transaction = connection.BeginTransaction())
                     {
-                        string grade = student.Grade; // Grade comes directly from the DataGrid binding
-
-                        string query = @"
-INSERT INTO student_module (StudentID, ModuleID, Grade)
-VALUES (@StudentID, @ModuleID, @Grade)
-ON DUPLICATE KEY UPDATE Grade = @Grade";
-
-                        try
+                        foreach (var student in students)
                         {
-                            using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
+                            string grade = (student.Grade ?? "").Trim().Replace(',', '.');
+                            string sql = grade.Length == 0
+                                ? "DELETE FROM student_module WHERE StudentID = @s AND ModuleID = @m"
+                                : "INSERT INTO student_module (StudentID, ModuleID, Grade) VALUES (@s, @m, @g) ON DUPLICATE KEY UPDATE Grade = VALUES(Grade)";
+                            using (var command = new MySqlCommand(sql, connection, transaction))
                             {
-                                await connection.OpenAsync();
-                                using (MySqlCommand command = new MySqlCommand(query, connection))
-                                {
-                                    command.Parameters.AddWithValue("@StudentID", student.StudentID);
-                                    command.Parameters.AddWithValue("@ModuleID", selectedModuleId);
-                                    command.Parameters.AddWithValue("@Grade", grade);
-
-                                    await command.ExecuteNonQueryAsync();
-                                }
+                                command.Parameters.AddWithValue("@s", student.StudentID);
+                                command.Parameters.AddWithValue("@m", moduleId);
+                                if (grade.Length > 0) command.Parameters.AddWithValue("@g", grade);
+                                await command.ExecuteNonQueryAsync();
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
+                        transaction.Commit();
                     }
                 }
-                MessageBox.Show("Grades saved successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Grades saved successfully.");
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Please select a module.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("The grades could not be saved.\n" + ex.Message, "Couldn't save", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-
-
-
-
-
-        // Placeholder for a method to show a dialog and return module details
-        private ModuleDetails ShowAddModuleDialog()
+        private static bool IsValidGrade(string grade)
         {
-            // Implement the dialog display logic here
-            // Return the module details as a ModuleDetails object
-            return new ModuleDetails
-            {
-                ModuleName = "Example Module",
-                ClassID = 1
-            };
+            grade = (grade ?? "").Trim().Replace(',', '.');
+            if (grade.Length == 0) return true;
+            if (decimal.TryParse(grade, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal value)) return value >= 0 && value <= 20;
+            return grade.Length <= 10 && grade.All(char.IsLetter);   // for example ABS
         }
-
-        // Placeholder class for module details
-        public class ModuleDetails
-        {
-            public string ModuleName { get; set; }
-            public int ClassID { get; set; }
-        }
-
     }
 }

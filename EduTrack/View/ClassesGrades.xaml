@@ -1,37 +1,80 @@
 ﻿<UserControl x:Class="EduTrack.View.ClassesGrades"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:EduTrack.View" Height="679" Width="1174"  Background="#212529">
-
+             xmlns:u="clr-namespace:EduTrack.Utilities">
+    <UserControl.Resources>
+        <u:ZeroToVisibleConverter x:Key="ZeroToVisible"/>
+        <Style x:Key="GradeEditor" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="MinHeight" Value="34"/>
+            <Setter Property="Margin" Value="-6,0"/>
+            <Setter Property="MaxLength" Value="10"/>
+        </Style>
+    </UserControl.Resources>
     <Grid>
-        <Label Content="Chose Class here " FontSize="20" Foreground="White" Margin="18,54,958,586" />
-        <ComboBox x:Name="classesComboBox" Style="{StaticResource ComboBox}" Margin="216,57,729,0" VerticalAlignment="Top" Height="35" SelectionChanged="classesComboBox_SelectionChanged"/>
-        <TextBox x:Name="moduleNameTextBox" Style="{StaticResource CustomTextBoxStyle}" Margin="730,57,202,0" VerticalAlignment="Top" Height="35" />
-        <Button x:Name="addModuleButton" Style="{StaticResource UploadPictureButtonStyle}" Content="Add Module" Margin="996,57,32,0" VerticalAlignment="Top" Click="AddModuleButton_Click" Height="35"/>
-        <ComboBox x:Name="ModuleComboBox" Style="{StaticResource ComboBox}" Margin="678,133,266,0" VerticalAlignment="Top" Height="35" SelectionChanged="ModuleComboBox_SelectionChanged" />
-        <DataGrid x:Name="studentsDataGrid" Margin="160,204,209,76" AutoGenerateColumns="False" ItemsSource="{Binding}" IsReadOnly="False" FontSize="20">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Students Name" Binding="{Binding FullName}"/>
-                <DataGridTemplateColumn Header="Grades">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Grade}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                    <DataGridTemplateColumn.CellEditingTemplate>
-                        <DataTemplate>
-                            <TextBox Text="{Binding Grade, UpdateSourceTrigger=PropertyChanged}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellEditingTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-        <Button x:Name="saveGradeButton" Content="Save grades" Style="{StaticResource UploadPictureButtonStyle}" Click="SaveGradeButton_Click" Margin="752,617,208,26"/>
-        <Label Content="Chose Module : " FontSize="20" Foreground="White" Margin="468,131,511,509" />
-        <Label Content="Create new Module : " FontSize="20" Foreground="White" Margin="466,55,450,585" />
+        <Border Style="{StaticResource Card}" Padding="20,16" Margin="0,0,0,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="240"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="240"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Class" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox x:Name="classesComboBox" Tag="Choose a class" SelectionChanged="classesComboBox_SelectionChanged"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Module" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox x:Name="ModuleComboBox" Tag="Choose a module" SelectionChanged="ModuleComboBox_SelectionChanged"/>
+                </StackPanel>
+                <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Bottom">
+                    <StackPanel Width="230">
+                        <TextBlock Text="Add a module to this class" Style="{StaticResource FieldLabel}"/>
+                        <TextBox x:Name="moduleNameTextBox" Tag="e.g. Algebra"/>
+                    </StackPanel>
+                    <Button x:Name="addModuleButton" Content="Add module" Click="AddModuleButton_Click" Margin="10,0,0,0" VerticalAlignment="Bottom"/>
+                </StackPanel>
+            </Grid>
+        </Border>
 
+        <Border Grid.Row="1" Style="{StaticResource Card}" Padding="0" ClipToBounds="True">
+            <Grid>
+                <DataGrid x:Name="studentsDataGrid" BorderThickness="0" Background="Transparent" ItemsSource="{Binding}" IsReadOnly="False" SelectionUnit="Cell">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Student" Binding="{Binding FullName}" Width="3*" IsReadOnly="True"/>
+                        <DataGridTemplateColumn Header="Grade" Width="1.2*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Grade}" FontWeight="Bold"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding Grade, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource GradeEditor}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="380" IsHitTestVisible="False"
+                            Visibility="{Binding Items.Count, ElementName=studentsDataGrid, Converter={StaticResource ZeroToVisible}}">
+                    <Border Width="64" Height="64" CornerRadius="32" Background="{DynamicResource PrimarySoftBrush}" HorizontalAlignment="Center">
+                        <Path Style="{StaticResource Icon}" Data="{StaticResource IconChart}" TextElement.Foreground="{DynamicResource PrimaryBrush}" Margin="20,20,0,0"/>
+                    </Border>
+                    <TextBlock x:Name="EmptyTitle" Text="No grades to enter yet" Style="{StaticResource SectionText}" TextAlignment="Center" Margin="0,16,0,0"/>
+                    <TextBlock x:Name="EmptyText" Text="Choose a class and a module above. The students of that class appear here, ready for their grades." Style="{StaticResource MutedText}" TextAlignment="Center" Margin="0,6,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Button x:Name="saveGradeButton" Grid.Row="2" Content="Save grades" Style="{StaticResource PrimaryButton}" Click="SaveGradeButton_Click"
+                HorizontalAlignment="Right" Margin="0,16,0,0" MinWidth="150" Height="42"/>
     </Grid>
 </UserControl>

@@ -1,67 +1,69 @@
 ﻿<UserControl x:Class="EduTrack.View.About"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:EduTrack.View"
-             mc:Ignorable="d" Width="1397" Height="677">
-    <Grid>
-        <Border Background="#212529" CornerRadius="20" HorizontalAlignment="Center" Width="1397">
-            <Grid Margin="20">
-                <TextBlock Text="About EduTrack" FontSize="30" Foreground="#10ccfc" FontWeight="Bold" Margin="528,0,491,592"/>
+             xmlns:u="clr-namespace:EduTrack.Utilities">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,14,8">
+        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="1000*" MaxWidth="1000"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <StackPanel>
+            <TextBlock Text="About EduTrack" Style="{StaticResource DisplayText}"/>
+            <TextBlock Text="A desktop register for schools and training centres." Style="{StaticResource MutedText}" Margin="0,4,0,24"/>
 
-                <TextBlock Text="            EduTrack is an educational management system designed to streamline the management process of an educational institution. It provides features to manage students, teachers, classes, and transactions. With EduTrack, you can easily track student and teacher information, class schedules, and financial transactions, all in one place." 
-           FontSize="20" Foreground="White" TextWrapping="Wrap" Margin="45,76,45,480" Width="1267" Height="81"/>
-                <Button Height="100" Click="OpenLink1" Margin="790,196,467,341" BorderBrush="Transparent">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="Transparent"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                    <Image Source="\Image\Icons\icon-github.png" Stretch="Uniform"/>
-                </Button>
+            <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Width="84" Height="84" CornerRadius="18" Background="{DynamicResource SidebarBrush}" VerticalAlignment="Top">
+                        <u:LogoMark Width="52" Height="52" Foreground="{DynamicResource SidebarInkBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="24,0,0,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="EduTrack" Style="{StaticResource TitleText}"/>
+                            <Border Style="{StaticResource Pill}" Margin="12,0,0,0" VerticalAlignment="Center">
+                                <TextBlock x:Name="VersionText" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}"/>
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Style="{StaticResource MutedText}" Margin="0,10,0,0" LineHeight="22" MaxWidth="640" HorizontalAlignment="Left"
+                                   Text="EduTrack keeps students, teachers, staff and classes in one place. Record who they are and which documents you hold, build each class's weekly schedule, enter grades, and keep an XML copy of your data."/>
+                    </StackPanel>
+                </Grid>
+            </Border>
 
-                <Button Width="100" Height="100" Click="OpenLink2" Margin="790,334,467,203" BorderBrush="Transparent">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="Transparent"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                    <Image Source="\Image\Icons\icon-linkedin.png" Stretch="Uniform"/>
-                </Button>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-                <Button Width="100" Height="100" Click="OpenLink3" Margin="790,477,467,60" BorderBrush="Transparent">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="Transparent"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                    <Image Source="\Image\Icons\icon-paypal.png" Stretch="Uniform"/>
-                </Button>
-                <TextBlock Text="Contact us :" VerticalAlignment="Top" Margin="45,177,1029,0" Height="38" FontSize="25" FontWeight="Bold" Foreground="white"/>
-                <TextBlock Text="Adamrohal581@gmail.com" VerticalAlignment="Top" Margin="75,257,1058,0" Height="23" FontSize="15" Foreground="white"/>
-                <TextBlock Text="Email :" VerticalAlignment="Top" Margin="60,220,1227,0" Height="32" FontSize="20" Foreground="#10ccfc"/>
-                <TextBlock Text="Phone :" VerticalAlignment="Top" Margin="60,286,1127,0" Height="32" FontSize="20" Foreground="#10ccfc"/>
-                <TextBlock Text="+212 671645861" VerticalAlignment="Top" Margin="75,323,1157,0" Height="23" FontSize="15" Foreground="white"/>
-                <Image Source="\Image\QR-code.png" Stretch="Uniform" Margin="934,188,37,47" />
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="Contact" Style="{StaticResource SectionText}"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                            <Path Style="{StaticResource Icon}" Data="{StaticResource IconMail}" TextElement.Foreground="{DynamicResource PrimaryBrush}"/>
+                            <TextBlock Text="Rohal.dev@hotmail.com" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                        </StackPanel>
+                        <WrapPanel Margin="0,22,0,0">
+                            <Button Content="GitHub" Click="OpenLink1" Margin="0,0,10,10"/>
+                            <Button Content="LinkedIn" Click="OpenLink2" Margin="0,0,10,10"/>
+                            <Button Content="Support the author" Click="OpenLink3" Margin="0,0,0,10"/>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Style="{StaticResource Card}">
+                    <StackPanel Orientation="Horizontal">
+                        <Border x:Name="QrTile" Background="White" CornerRadius="12" Padding="8" VerticalAlignment="Top" BorderThickness="3" BorderBrush="{DynamicResource AccentBrush}">
+                            <Image x:Name="QrImage" Width="132" Height="132" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor" ToolTip="adamrohal.tech"/>
+                        </Border>
+                        <StackPanel Margin="20,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="Scan to visit the website" Style="{StaticResource SectionText}"/>
+                            <TextBlock Text="Point your phone camera here to open adamrohal.tech. Questions or ideas? Write to the email on the left." Style="{StaticResource MutedText}" Margin="0,6,0,0" MaxWidth="240"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
             </Grid>
-
-        </Border>
-
-    </Grid>
+        </StackPanel></Grid>
+    </ScrollViewer>
 </UserControl>

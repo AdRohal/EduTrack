@@ -1,124 +1,140 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Windows.Controls;
-using MySql.Data.MySqlClient;
-using EduTrack.Models;
-using System.Windows;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 using EduTrack.Data;
+using EduTrack.Models;
+using EduTrack.Utilities;
+using MySql.Data.MySqlClient;
 
 namespace EduTrack.View
 {
-    /// <summary>
-    /// Interaction logic for ShowTeachers.xaml
-    /// </summary>
     public partial class ShowTeachers : UserControl
     {
+        private readonly DispatcherTimer _searchDelay = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
+
         public ShowTeachers()
         {
             InitializeComponent();
-            LoadTeachers();
-            this.DataContext = this;
+            _searchDelay.Tick += async (s, e) => { _searchDelay.Stop(); await LoadTeachersAsync(SearchBox.Text.Trim()); };
+            Loaded += async (s, e) => { await LoadTeachersAsync(); SearchBox.Focus(); };
         }
 
-        private void Button_Click1(object sender, RoutedEventArgs e)
+        private void OpenSelected()
         {
-            Teacher selectedTeacher = TeachersList.SelectedItem as Teacher;
+            if (!(TeachersList.SelectedItem is Teacher selected)) return;
 
-            if (selectedTeacher == null)
-            {
-                MessageBox.Show("Please select an teacher first.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
+            var host = HubHelper.FindDetailHost(this);
+            if (host == null) return;
+            var detailedView = new DetailedTeacherInfoView(selected);
+            detailedView.Closed += (s, e) => host.CloseDetail();
+            host.ShowDetail(detailedView);
+        }
 
-            DetailedTeacherInfoView detailedView = new DetailedTeacherInfoView(selectedTeacher)
-            {
-                SizeToContent = SizeToContent.WidthAndHeight,
-                WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                Title = "Teacher Details"
-            };
-            detailedView.ShowDialog();
+        private void Button_Click1(object sender, RoutedEventArgs e) => OpenSelected();
+
+        private void TeachersList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (e.OriginalSource is DependencyObject source && ItemsControl.ContainerFromElement(TeachersList, source) is DataGridRow)
+                OpenSelected();
+        }
+
+        private void TeachersList_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter) { OpenSelected(); e.Handled = true; }
         }
 
         private async Task LoadTeachersAsync(string searchText = null)
         {
-            string query = "SELECT TeacherID, p_pic,f_name, m_name, l_name, gender, email, phone, b_date, nationality, cin, address, role, j_date, contract_start, contract_end, salary, Module FROM teacher_registry";
-            if (!string.IsNullOrEmpty(searchText))
-            {
-                query += $" WHERE f_name LIKE '%{searchText}%' OR m_name LIKE '%{searchText}%' OR l_name LIKE '%{searchText}%'";
-            }
+            string query = "SELECT TeacherID, p_pic, f_name, m_name, l_name, gender, email, phone, b_date, nationality, cin, address, role, j_date, contract_start, contract_end, salary, module FROM teacher_registry";
+            bool searching = !string.IsNullOrEmpty(searchText);
+            if (searching)
+                query += " WHERE f_name LIKE @q OR m_name LIKE @q OR l_name LIKE @q OR CONCAT(f_name, ' ', l_name) LIKE @q";
+            query += " ORDER BY l_name, f_name";
 
-            ObservableCollection<Teacher> empList = new ObservableCollection<Teacher>();
-
+            var teachers = new ObservableCollection<Teacher>();
             try
             {
                 using (MySqlConnection connection = DatabaseConnectionManager.CreateConnection())
                 {
                     await connection.OpenAsync();
-                    using (MySqlCommand command = new MySqlCommand(query, connection))
-                    using (MySqlDataReader reader = (MySqlDataReader)await command.ExecuteReaderAsync())
+                    using (var command = new MySqlCommand(query, connection))
                     {
-                        while (await reader.ReadAsync())
+                        if (searching) command.Parameters.AddWithValue("@q", "%" + searchText + "%");
+                        using (var reader = (MySqlDataReader)await command.ExecuteReaderAsync())
                         {
-                            Teacher teacher = new Teacher
+                            while (await reader.ReadAsync())
                             {
-                                Id = reader.GetInt32("TeacherID"),
-                                P_Pic = reader.IsDBNull(reader.GetOrdinal("p_pic")) ? null : reader.GetString("p_pic"),
-                                FirstName = reader.IsDBNull(reader.GetOrdinal("f_name")) ? null : reader.GetString("f_name"),
-                                MiddleName = reader.IsDBNull(reader.GetOrdinal("m_name")) ? null : reader.GetString("m_name"),
-                                LastName = reader.IsDBNull(reader.GetOrdinal("l_name")) ? null : reader.GetString("l_name"),
-                                Gender = reader.IsDBNull(reader.GetOrdinal("gender")) ? null : reader.GetString("gender"),
-                                Email = reader.IsDBNull(reader.GetOrdinal("email")) ? null : reader.GetString("email"),
-                                Phone = reader.IsDBNull(reader.GetOrdinal("phone")) ? null : reader.GetString("phone"),
-                                BirthDate = reader.IsDBNull(reader.GetOrdinal("b_date")) ? (DateTime?)null : reader.GetDateTime("b_date"),
-                                Nationality = reader.IsDBNull(reader.GetOrdinal("nationality")) ? null : reader.GetString("nationality"),
-                                Cin = reader.IsDBNull(reader.GetOrdinal("cin")) ? null : reader.GetString("cin"),
-                                Address = reader.IsDBNull(reader.GetOrdinal("address")) ? null : reader.GetString("address"),
-                                Role = reader.IsDBNull(reader.GetOrdinal("role")) ? null : reader.GetString("role"),
-                                JoinDate = reader.IsDBNull(reader.GetOrdinal("j_date")) ? (DateTime?)null : reader.GetDateTime("j_date"),
-                                ContractStartDate = reader.IsDBNull(reader.GetOrdinal("contract_start")) ? (DateTime?)null : reader.GetDateTime("contract_start"),
-                                ContractEndDate = reader.IsDBNull(reader.GetOrdinal("contract_end")) ? (DateTime?)null : reader.GetDateTime("contract_end"),
-                                Salary = reader.IsDBNull(reader.GetOrdinal("salary")) ? 0 : reader.GetInt32("salary"),
-                                Module = reader.IsDBNull(reader.GetOrdinal("Module")) ? null : reader.GetString("Module")
-                            };
-                            empList.Add(teacher);
+                                teachers.Add(new Teacher
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("TeacherID")),
+                                    P_Pic = reader.Str("p_pic"),
+                                    FirstName = reader.Str("f_name"),
+                                    MiddleName = reader.Str("m_name"),
+                                    LastName = reader.Str("l_name"),
+                                    Gender = reader.Str("gender"),
+                                    Email = reader.Str("email"),
+                                    Phone = reader.Str("phone"),
+                                    BirthDate = reader.Date("b_date"),
+                                    Nationality = reader.Str("nationality"),
+                                    Cin = reader.Str("cin"),
+                                    Address = reader.Str("address"),
+                                    Role = reader.Str("role"),
+                                    JoinDate = reader.Date("j_date"),
+                                    ContractStartDate = reader.Date("contract_start"),
+                                    ContractEndDate = reader.Date("contract_end"),
+                                    Salary = reader.Int("salary") ?? 0,
+                                    Module = reader.Str("module")
+                                });
+                            }
                         }
                     }
                 }
-                Dispatcher.Invoke(() =>
-                {
-                    TeachersList.ItemsSource = empList;
-                });
+                TeachersList.ItemsSource = teachers;
+                ShowState(teachers.Count, searching ? searchText : null);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowState(0, null);
+                MessageBox.Show("The teacher list could not be loaded. Check that the database is running.\n" + ex.Message,
+                    "Can't load teachers", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private async void LoadTeachers()
+        private void ShowState(int count, string search)
         {
-            await LoadTeachersAsync();
+            CountText.Text = search == null ? (count == 1 ? "1 teacher" : count + " teachers")
+                                            : (count == 1 ? "1 match" : count + " matches");
+            bool empty = count == 0;
+            EmptyState.Visibility = empty ? Visibility.Visible : Visibility.Collapsed;
+            TeachersList.Visibility = empty ? Visibility.Collapsed : Visibility.Visible;
+            if (!empty) return;
+
+            if (search != null)
+            {
+                EmptyTitle.Text = "No teacher matches “" + search + "”";
+                EmptyHint.Text = "Check the spelling, or try just a first or last name.";
+                EmptyAction.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                EmptyTitle.Text = "No teachers yet";
+                EmptyHint.Text = "Teachers you add will show up here, ready to search and open.";
+                EmptyAction.Visibility = Visibility.Visible;
+            }
         }
-        private async void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+
+        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string searchText = SearchBox.Text;
-            await LoadTeachersAsync(searchText);
+            _searchDelay.Stop();
+            _searchDelay.Start();
         }
-        private void ScrollViewer_MouseEnter(object sender, MouseEventArgs e)
-        {
-            (sender as ScrollViewer)?.Focus();
-        }
-        private void ListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            ScrollViewer scv = (ScrollViewer)sender;
-            scv.ScrollToVerticalOffset(scv.VerticalOffset - e.Delta);
-            e.Handled = true;
-        }
-        private async void Refresh_Click(object sender, RoutedEventArgs e)
-        {
-            await LoadTeachersAsync();
-        }
+
+        private async void Refresh_Click(object sender, RoutedEventArgs e) => await LoadTeachersAsync(SearchBox.Text.Trim());
+
+        private void EmptyAction_Click(object sender, RoutedEventArgs e) => HubHelper.Find(this)?.SelectTab(0);
     }
 }

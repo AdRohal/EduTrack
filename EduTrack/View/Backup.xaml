@@ -1,35 +1,45 @@
 ﻿<UserControl x:Class="EduTrack.View.Backup"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:EduTrack.View"
-             mc:Ignorable="d" Height="672" Width="1174"  Background="Transparent">
-    <Grid>
-        <Border Background="#212529" CornerRadius="20" HorizontalAlignment="Center" Width="1397"></Border>
-        <Grid Background="#272B2F" Margin="48,78,48,336">
-            <ComboBox x:Name="comboBox1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="274" Margin="166,40,0,0" Style="{StaticResource ComboBox}" Height="42" FontSize="20">
-                <ComboBoxItem>employee</ComboBoxItem>
-                <ComboBoxItem>teacher</ComboBoxItem>
-                <ComboBoxItem>student</ComboBoxItem>
-            </ComboBox>
-            <TextBlock Text="Chose Here :" FontSize="20" Foreground="White" Margin="166,0,692,223"/>
-            <Button x:Name="downloadButton" Content="Download" Click="downloadButton_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Width="234" Margin="785,40,0,0" Height="42" Style="{StaticResource UploadPictureButtonStyle}"/>
-            <Button x:Name="uploadButton" Content="Upload" HorizontalAlignment="Left" VerticalAlignment="Top" Width="274" Click="uploadButton_Click" Margin="166,155,0,0"  Style="{StaticResource UploadPictureButtonStyle}"/>
-            <TextBlock Text="Importe XML Here :" FontSize="20" Foreground="White" Margin="166,112,692,112"/>
-            <Button x:Name="importButton" Content="Importer" HorizontalAlignment="Left" VerticalAlignment="Top" Width="234" Click="importButton_Click"  Style="{StaticResource UploadPictureButtonStyle}" Margin="785,155,0,0"/>
-            <TextBlock x:Name="fileNameTextBlock" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="469,155,0,0" Foreground="White" FontSize="20" Width="279" Height="36"/>
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,14,8">
+        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="1000*" MaxWidth="900"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <StackPanel>
 
-        </Grid>
-        <TextBlock Text="Save To XML" FontSize="30" Foreground="#10ccfc" FontWeight="Bold" Margin="508,5,476,627" RenderTransformOrigin="0.5,0.5">
-            <TextBlock.RenderTransform>
-                <TransformGroup>
-                    <ScaleTransform/>
-                    <SkewTransform/>
-                    <RotateTransform Angle="0.031"/>
-                    <TranslateTransform/>
-                </TransformGroup>
-            </TextBlock.RenderTransform>
-        </TextBlock>
-    </Grid>
+            <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="Save a copy" Style="{StaticResource SectionText}"/>
+                    <TextBlock Text="Export one list to an XML file you can keep safe or move to another computer." Style="{StaticResource MutedText}" Margin="0,4,0,18"/>
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel Width="260">
+                            <TextBlock Text="What to save" Style="{StaticResource FieldLabel}"/>
+                            <ComboBox x:Name="comboBox1" SelectedIndex="0">
+                                <ComboBoxItem Content="Students"/>
+                                <ComboBoxItem Content="Teachers"/>
+                                <ComboBoxItem Content="Employees"/>
+                            </ComboBox>
+                        </StackPanel>
+                        <Button x:Name="downloadButton" Content="Save to file" Style="{StaticResource PrimaryButton}" Click="downloadButton_Click"
+                                VerticalAlignment="Bottom" Margin="14,0,0,0"/>
+                    </StackPanel>
+                    <StackPanel x:Name="ExportResult" Orientation="Horizontal" Margin="0,16,0,0" Visibility="Collapsed">
+                        <Path Style="{StaticResource Icon}" Data="{StaticResource IconCheck}" TextElement.Foreground="{DynamicResource SuccessBrush}"/>
+                        <TextBlock x:Name="ExportResultText" VerticalAlignment="Center" Margin="8,0,12,0" Foreground="{DynamicResource SuccessBrush}" FontWeight="Bold"/>
+                        <Button Content="Show in folder" Click="ShowFolder_Click" MinHeight="32" Padding="12,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="Restore from a copy" Style="{StaticResource SectionText}"/>
+                    <TextBlock Text="Choose a file saved above. Records with the same ID are replaced by the ones in the file." Style="{StaticResource MutedText}" Margin="0,4,0,18"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="uploadButton" Content="Choose file" Click="uploadButton_Click"/>
+                        <TextBlock x:Name="fileNameTextBlock" Text="No file chosen" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="14,0,20,0"/>
+                        <Button x:Name="importButton" Content="Restore data" Style="{StaticResource PrimaryButton}" Click="importButton_Click" IsEnabled="False"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel></Grid>
+    </ScrollViewer>
 </UserControl>
