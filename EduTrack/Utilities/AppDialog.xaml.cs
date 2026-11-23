@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -45,8 +45,8 @@ namespace EduTrack.Utilities
             IconGlyph.SetResourceReference(TextBlock.ForegroundProperty, fg);
             IconBadge.SetResourceReference(Border.BackgroundProperty, bg);
 
-            TitleText.Text = string.IsNullOrWhiteSpace(caption) ? DefaultTitle(image) : caption;
-            MessageText.Text = message ?? string.Empty;
+            TitleText.Text = Loc.T(string.IsNullOrWhiteSpace(caption) ? DefaultTitle(image) : caption);
+            MessageText.Text = Loc.T(message ?? string.Empty);
 
             switch (buttons)
             {
@@ -86,7 +86,7 @@ namespace EduTrack.Utilities
         {
             var button = new Button
             {
-                Content = text,
+                Content = Loc.T(text),
                 MinWidth = 96,
                 Margin = new Thickness(ButtonRow.Children.Count == 0 ? 0 : 10, 0, 0, 0),
                 IsDefault = isDefault

@@ -187,11 +187,12 @@ namespace EduTrack
 
         private void StartClock()
         {
-            void Tick() => ClockTextBlock.Text = DateTime.Now.ToString("dddd d MMMM, HH:mm");
+            void Tick() => ClockTextBlock.Text = DateTime.Now.ToString("dddd d MMMM, HH:mm", Loc.DisplayCulture);
             Tick();
             var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(20) };
             timer.Tick += (s, e) => Tick();
             timer.Start();
+            Action refresh = Tick; Loc.LanguageChanged += refresh; Closed += (s, e) => Loc.LanguageChanged -= refresh;
             Closed += (s, e) => timer.Stop();
         }
 

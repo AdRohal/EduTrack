@@ -1,0 +1,234 @@
+﻿<UserControl x:Class="EduTrack.View.ClassGrades"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:u="clr-namespace:EduTrack.Utilities">
+    <UserControl.Resources>
+        <Style x:Key="ScoreEditor" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="MinHeight" Value="32"/>
+            <Setter Property="Margin" Value="-4,0"/>
+            <Setter Property="MaxLength" Value="8"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="ScoreText" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+
+        <Style x:Key="RailItem" TargetType="ListBoxItem">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,0,0,2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Bd" Background="Transparent" CornerRadius="8" Padding="2">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SurfaceHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PrimarySoftBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="214"/>
+            <ColumnDefinition Width="14"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Modules -->
+        <Border Style="{StaticResource Card}" Padding="6">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid Margin="10,6,4,8">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <TextBlock Text="Modules" Style="{StaticResource SectionText}" VerticalAlignment="Center"/>
+                    <Button Grid.Column="1" Style="{StaticResource IconButton}" Click="AddModule_Click" ToolTip="Add module" Width="32" Height="32" MinHeight="32">
+                        <Path Style="{StaticResource Icon}" Data="{StaticResource IconPlus}"/>
+                    </Button>
+                </Grid>
+                <ListBox x:Name="Rail" Grid.Row="1" ItemContainerStyle="{StaticResource RailItem}" SelectionChanged="Rail_SelectionChanged">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="10,7">
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding Sub}" Style="{StaticResource CaptionText}" TextTrimming="CharacterEllipsis"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Module editor -->
+            <Border x:Name="ModuleEditor" Style="{StaticResource Card}" Padding="16,14" Margin="0,0,0,12" Visibility="Collapsed">
+                <StackPanel>
+                    <TextBlock x:Name="ModuleEditorTitle" Text="New module" Style="{StaticResource SectionText}" Margin="0,0,0,10"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="110"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Module name" Style="{StaticResource FieldLabel}"/>
+                            <TextBox x:Name="ModuleName" MaxLength="100" Tag="e.g. Algebra"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Teacher" Style="{StaticResource FieldLabel}"/>
+                            <ComboBox x:Name="ModuleTeacher" DisplayMemberPath="Name" Tag="No teacher"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="4">
+                            <TextBlock Text="Coefficient" Style="{StaticResource FieldLabel}"/>
+                            <TextBox x:Name="ModuleCoef" Text="1" MaxLength="5"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <TextBlock x:Name="ModuleMessage" VerticalAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource DangerBrush}" FontWeight="Bold"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Button Content="Cancel" Click="CancelModule_Click" Margin="0,0,10,0"/>
+                            <Button Content="Save module" Style="{StaticResource PrimaryButton}" Click="SaveModule_Click" MinWidth="130"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Assessment editor -->
+            <Border x:Name="AssessmentEditor" Grid.Row="1" Style="{StaticResource Card}" Padding="16,14" Margin="0,0,0,12" Visibility="Collapsed">
+                <StackPanel>
+                    <TextBlock x:Name="AssessmentEditorTitle" Text="New assessment" Style="{StaticResource SectionText}" Margin="0,0,0,10"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="150"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Title" Style="{StaticResource FieldLabel}"/>
+                            <TextBox x:Name="AssessmentTitle" MaxLength="100" Tag="e.g. Midterm exam"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Type" Style="{StaticResource FieldLabel}"/>
+                            <ComboBox x:Name="AssessmentKind"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="4">
+                            <TextBlock Text="Weight" Style="{StaticResource FieldLabel}" ToolTip="How much it counts in the module average"/>
+                            <TextBox x:Name="AssessmentWeight" Text="1" MaxLength="5"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="6">
+                            <TextBlock Text="Out of" Style="{StaticResource FieldLabel}"/>
+                            <TextBox x:Name="AssessmentMax" Text="20" MaxLength="5"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="8">
+                            <TextBlock Text="Date" Style="{StaticResource FieldLabel}"/>
+                            <DatePicker x:Name="AssessmentDate"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <TextBlock x:Name="AssessmentMessage" VerticalAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource DangerBrush}" FontWeight="Bold"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Button x:Name="DeleteAssessmentButton" Content="Delete assessment" Click="DeleteAssessment_Click" Foreground="{DynamicResource DangerBrush}" BorderBrush="{DynamicResource DangerBrush}" Margin="0,0,10,0"/>
+                            <Button Content="Cancel" Click="CancelAssessment_Click" Margin="0,0,10,0"/>
+                            <Button Content="Save assessment" Style="{StaticResource PrimaryButton}" Click="SaveAssessment_Click" MinWidth="150"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Module header: name, teacher, and its assessments -->
+            <StackPanel x:Name="ModuleHeader" Grid.Row="2" Margin="0,0,0,10" Visibility="Collapsed">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock x:Name="ModuleTitle" Style="{StaticResource SectionText}" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock x:Name="ModuleMeta" Style="{StaticResource CaptionText}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="Add assessment" Click="AddAssessment_Click" Margin="0,0,8,0" MinHeight="34"/>
+                        <Button Style="{StaticResource IconButton}" Click="EditModule_Click" ToolTip="Edit module" Foreground="{DynamicResource MutedBrush}">
+                            <Path Style="{StaticResource Icon}" Data="{StaticResource IconEdit}"/>
+                        </Button>
+                        <Button Style="{StaticResource IconButton}" Click="DeleteModule_Click" ToolTip="Delete module" Foreground="{DynamicResource DangerBrush}">
+                            <Path Style="{StaticResource Icon}" Data="{StaticResource IconTrash}"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+                <ItemsControl x:Name="AssessmentChips" Margin="0,8,0,0">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Click="Assessment_Click" Margin="0,0,8,6" Padding="12,4" ToolTip="{Binding Detail}">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Title}" FontWeight="Bold" TextTrimming="CharacterEllipsis" MaxWidth="160"/>
+                                    <TextBlock Text="{Binding Short}" Style="{StaticResource CaptionText}"/>
+                                </StackPanel>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+            <!-- The grid -->
+            <Border Grid.Row="3" Style="{StaticResource Card}" Padding="0" ClipToBounds="True">
+                <Grid>
+                    <DataGrid x:Name="Scores" BorderThickness="0" Background="Transparent" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+                              SelectionUnit="Cell" HeadersVisibility="Column" GridLinesVisibility="None" CanUserResizeRows="False"/>
+                    <StackPanel x:Name="EmptyState" HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="400" IsHitTestVisible="False">
+                        <TextBlock x:Name="EmptyTitle" Style="{StaticResource SectionText}" TextAlignment="Center"/>
+                        <TextBlock x:Name="EmptyText" Style="{StaticResource MutedText}" TextAlignment="Center" Margin="0,6,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Save bar / class figures -->
+            <Grid Grid.Row="4" Margin="0,12,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="FooterText" Style="{StaticResource MutedText}" VerticalAlignment="Center"/>
+                <StackPanel x:Name="SaveBar" Grid.Column="1" Orientation="Horizontal" Visibility="Collapsed">
+                    <TextBlock x:Name="DirtyText" Text="Unsaved changes" Foreground="{DynamicResource LateBrush}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,14,0" Visibility="Collapsed"/>
+                    <Button x:Name="SaveScoresButton" Content="Save grades" Style="{StaticResource PrimaryButton}" Click="SaveScores_Click" MinWidth="150" IsEnabled="False"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

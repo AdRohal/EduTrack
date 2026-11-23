@@ -19,7 +19,7 @@ namespace EduTrack.View
         {
             InitializeComponent();
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-            VersionText.Text = "Version " + version.Major + "." + version.Minor + "." + version.Build;
+            VersionText.Text = Loc.T("Version " + version.Major + "." + version.Minor + "." + version.Build);
             Loaded += (s, e) => { ThemeManager.ThemeChanged += DrawQr; DrawQr(); };
             Unloaded += (s, e) => ThemeManager.ThemeChanged -= DrawQr;
         }
@@ -56,7 +56,7 @@ namespace EduTrack.View
 
         private void OpenLink2(object sender, RoutedEventArgs e) => Open("https://www.linkedin.com/in/adrohal/");
 
-        private void OpenLink3(object sender, RoutedEventArgs e) => Open("https://paypal.me/rhladam?country.x=MA&locale.x=en_US");
+        private void OpenLink3(object sender, RoutedEventArgs e) => Open("https://ko-fi.com/adrohal");
 
         private static void Open(string url) => Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
     }

@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Windows;
 using EduTrack.Utilities;
 
@@ -29,7 +29,7 @@ namespace EduTrack
             if (buttons == MessageBoxButton.OK && !failure && image != MessageBoxImage.Error && image != MessageBoxImage.Warning
                 && message != null && SuccessPattern.IsMatch(message))
             {
-                ToastWindow.Show(message);
+                ToastWindow.Show(Loc.T(message));
                 return MessageBoxResult.OK;
             }
             if (failure && image == MessageBoxImage.None) image = MessageBoxImage.Error;

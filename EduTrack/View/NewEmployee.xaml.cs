@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
@@ -267,8 +267,8 @@ namespace EduTrack.View
                 int totalYears = (int)(timeSpan.TotalDays / 365.25);
                 int totalMonths = (int)((timeSpan.TotalDays % 365.25) / 30.4375);
 
-                string yearsString = totalYears == 1 ? "year" : "years";
-                string monthsString = totalMonths == 1 ? "month" : "months";
+                string yearsString = totalYears == 1 ? Loc.T("year") : Loc.T("years");
+                string monthsString = totalMonths == 1 ? Loc.T("month") : Loc.T("months");
 
                 if (totalYears == 0)
                 {

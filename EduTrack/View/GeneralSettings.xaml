@@ -15,7 +15,7 @@
                                 <ContentPresenter Content="{TemplateBinding Tag}"/>
                                 <Grid Margin="0,12,0,0">
                                     <TextBlock Text="{TemplateBinding Content}" FontWeight="Bold" Foreground="{DynamicResource InkBrush}"/>
-                                    <Path x:Name="Tick" Style="{StaticResource Icon}" Data="{StaticResource IconCheck}" TextElement.Foreground="{DynamicResource PrimaryBrush}"
+                                    <Path x:Name="Tick" FlowDirection="LeftToRight" Style="{StaticResource Icon}" Data="{StaticResource IconCheck}" TextElement.Foreground="{DynamicResource PrimaryBrush}"
                                           HorizontalAlignment="Right" Visibility="Collapsed" Margin="0,-2,0,0"/>
                                 </Grid>
                             </StackPanel>
@@ -83,6 +83,28 @@
                         </RadioButton>
                     </StackPanel>
                 </StackPanel>
+            </Border>
+                    <Border Style="{StaticResource Card}" Margin="0,16,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
+                        <TextBlock Text="Language" Style="{StaticResource SectionText}"/>
+                        <TextBlock Text="Choose the language of the whole app. EduTrack remembers your choice." Style="{StaticResource MutedText}" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <ComboBox x:Name="LanguageBox" Grid.Column="1" Width="240" VerticalAlignment="Center" SelectionChanged="Language_Changed">
+                        <ComboBoxItem Tag="en" Content="English"/>
+                        <ComboBoxItem Tag="fr" Content="Français"/>
+                        <ComboBoxItem Tag="es" Content="Español"/>
+                        <ComboBoxItem Tag="ar" Content="العربية"/>
+                        <ComboBoxItem Tag="id" Content="Bahasa Indonesia"/>
+                        <ComboBoxItem Tag="zh" Content="中文（简体）"/>
+                        <ComboBoxItem Tag="ja" Content="日本語"/>
+                        <ComboBoxItem Tag="ko" Content="한국어"/>
+                    </ComboBox>
+                </Grid>
             </Border>
         </StackPanel></Grid>
     </ScrollViewer>

@@ -46,4 +46,5 @@
     <Geometry x:Key="IconMail">M3,6 H21 V18 H3 Z M3,7 L12,13.5 L21,7</Geometry>
     <Geometry x:Key="IconPhone">M7,3 H11 L12.5,8 L10,9.5 C11,12 13,14 15.5,15 L17,12.5 L21,14 V18 C21,19.5 19.5,21 18,21 C10,21 3,14 3,6 C3,4.5 5.5,3 7,3 Z</Geometry>
     <Geometry x:Key="IconSchedule">M3,12 A9,9 0 1 0 21,12 A9,9 0 1 0 3,12 M12,7 V12 L15.5,14</Geometry>
+    <Geometry x:Key="IconHeart">M12,20.5 C5,15 3,11.5 3,8.5 C3,6 5,4 7.5,4 C9.5,4 11,5 12,6.5 C13,5 14.5,4 16.5,4 C19,4 21,6 21,8.5 C21,11.5 19,15 12,20.5 Z</Geometry>
 </ResourceDictionary>

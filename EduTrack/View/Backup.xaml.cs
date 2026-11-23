@@ -1,4 +1,5 @@
 ﻿using System;
+using EduTrack.Utilities;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
@@ -47,7 +48,7 @@ namespace EduTrack.View
 
             var dialog = new SaveFileDialog
             {
-                Title = "Save " + label.ToLower(),
+                Title = Loc.T("Save " + label.ToLower()),
                 Filter = "XML files (*.xml)|*.xml",
                 FileName = table + "-" + DateTime.Now.ToString("yyyy-MM-dd") + ".xml",
                 InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EduTrack")

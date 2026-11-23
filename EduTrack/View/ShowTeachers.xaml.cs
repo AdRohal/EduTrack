@@ -106,8 +106,8 @@ namespace EduTrack.View
 
         private void ShowState(int count, string search)
         {
-            CountText.Text = search == null ? (count == 1 ? "1 teacher" : count + " teachers")
-                                            : (count == 1 ? "1 match" : count + " matches");
+            CountText.Text = Loc.T(search == null ? (count == 1 ? "1 teacher" : count + " teachers")
+                                            : (count == 1 ? "1 match" : count + " matches"));
             bool empty = count == 0;
             EmptyState.Visibility = empty ? Visibility.Visible : Visibility.Collapsed;
             TeachersList.Visibility = empty ? Visibility.Collapsed : Visibility.Visible;
@@ -115,14 +115,14 @@ namespace EduTrack.View
 
             if (search != null)
             {
-                EmptyTitle.Text = "No teacher matches “" + search + "”";
-                EmptyHint.Text = "Check the spelling, or try just a first or last name.";
+                EmptyTitle.Text = Loc.T("No teacher matches “" + search + "”");
+                EmptyHint.Text = Loc.T("Check the spelling, or try just a first or last name.");
                 EmptyAction.Visibility = Visibility.Collapsed;
             }
             else
             {
-                EmptyTitle.Text = "No teachers yet";
-                EmptyHint.Text = "Teachers you add will show up here, ready to search and open.";
+                EmptyTitle.Text = Loc.T("No teachers yet");
+                EmptyHint.Text = Loc.T("Teachers you add will show up here, ready to search and open.");
                 EmptyAction.Visibility = Visibility.Visible;
             }
         }

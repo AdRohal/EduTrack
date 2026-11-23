@@ -1,4 +1,4 @@
-<UserControl x:Class="EduTrack.View.DocumentViewerOverlay"
+﻿<UserControl x:Class="EduTrack.View.DocumentViewerOverlay"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Visibility="Collapsed" Focusable="True" WindowChrome.IsHitTestVisibleInChrome="True">
@@ -44,7 +44,7 @@
         </Grid>
 
         <!-- Image area: wheel zooms toward the cursor, drag moves the picture -->
-        <Border x:Name="Viewport" Grid.Row="1" Background="Transparent" ClipToBounds="True" Cursor="Hand"
+        <Border x:Name="Viewport" Grid.Row="1" Background="Transparent" ClipToBounds="True" Cursor="Hand" FlowDirection="LeftToRight"
                 SizeChanged="Viewport_SizeChanged" MouseWheel="Viewport_MouseWheel"
                 MouseLeftButtonDown="Viewport_MouseDown" MouseLeftButtonUp="Viewport_MouseUp" MouseMove="Viewport_MouseMove">
             <Canvas>

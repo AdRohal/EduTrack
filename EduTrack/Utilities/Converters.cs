@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.IO;
 using System.Windows;
@@ -45,7 +45,7 @@ namespace EduTrack.Utilities
     public class ShortDateConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            => value is DateTime d ? d.ToString("d MMM yyyy", CultureInfo.InvariantCulture) : "–";
+            => value is DateTime d ? Loc.ShortDate(d) : "–";
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotSupportedException();
     }
 

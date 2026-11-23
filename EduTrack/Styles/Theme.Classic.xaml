@@ -39,4 +39,6 @@
     <SolidColorBrush x:Key="InputReadOnlyBrush" Color="#69738F"/>
     <SolidColorBrush x:Key="InputBorderBrush" Color="#9AA3BD"/>
     <SolidColorBrush x:Key="InputBgBrush" Color="#808BA8"/>
+    <SolidColorBrush x:Key="LateBrush" Color="#E7B04A"/>
+    <SolidColorBrush x:Key="LateSoftBrush" Color="#3A2F18"/>
 </ResourceDictionary>

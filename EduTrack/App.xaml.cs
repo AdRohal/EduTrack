@@ -12,6 +12,7 @@ namespace EduTrack
         protected override void OnStartup(StartupEventArgs e)
         {
             ThemeManager.Initialize();
+            Loc.Initialize();
             DispatcherUnhandledException += (s, args) =>
             {
                 MessageBox.Show("EduTrack hit a problem it could not recover from:\n" + args.Exception.Message,
@@ -29,10 +30,10 @@ namespace EduTrack
         {
             try
             {
-                var menu = new System.Windows.Forms.ContextMenuStrip();
-                menu.Items.Add("Open EduTrack", null, (s, a) => BringToFront());
+                var menu = new System.Windows.Forms.ContextMenuStrip { RightToLeft = Loc.IsRtl ? System.Windows.Forms.RightToLeft.Yes : System.Windows.Forms.RightToLeft.No };
+                menu.Items.Add(Loc.T("Open EduTrack"), null, (s, a) => BringToFront());
                 menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
-                menu.Items.Add("Exit EduTrack", null, (s, a) => Dispatcher.Invoke(Shutdown));
+                menu.Items.Add(Loc.T("Exit EduTrack"), null, (s, a) => Dispatcher.Invoke(Shutdown));
 
                 _tray = new System.Windows.Forms.NotifyIcon
                 {

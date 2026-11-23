@@ -45,7 +45,7 @@ namespace EduTrack
                 if (!anyUser)
                 {
                     SetMode(creating: true);
-                    SubText.Text = "No accounts exist yet. Create the first administrator to get started.";
+                    SubText.Text = Loc.T("No accounts exist yet. Create the first administrator to get started.");
                 }
             };
         }
@@ -78,8 +78,8 @@ namespace EduTrack
             {
                 RememberedName.Text = _remembered;
                 RememberedInitial.Text = _remembered.Substring(0, 1).ToUpperInvariant();
-                HeadingText.Text = "Welcome back";
-                SubText.Text = "Enter your password to continue.";
+                HeadingText.Text = Loc.T("Welcome back");
+                SubText.Text = Loc.T("Enter your password to continue.");
                 Password.Focus();
             }
             else
@@ -94,12 +94,13 @@ namespace EduTrack
             _remembered = null;
             Password.Clear();
             ShowError(null);
-            SubText.Text = "Use your administrator account to open the register.";
+            SubText.Text = Loc.T("Use your administrator account to open the register.");
             ApplyIdentityUi();
         }
 
         private void ShowError(string message)
         {
+            message = Loc.T(message);
             ErrorBox.Visibility = string.IsNullOrEmpty(message) ? Visibility.Collapsed : Visibility.Visible;
             ErrorText.Text = message;
         }

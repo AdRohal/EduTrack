@@ -1,4 +1,5 @@
 ﻿using System;
+using EduTrack.Utilities;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Animation;
@@ -18,7 +19,7 @@ namespace EduTrack
         private async Task ConnectAsync()
         {
             FailurePanel.Visibility = Visibility.Collapsed;
-            StatusText.Text = "Connecting to the database";
+            StatusText.Text = Loc.T("Connecting to the database");
             progressBar.BeginAnimation(System.Windows.Controls.Primitives.RangeBase.ValueProperty,
                 new DoubleAnimation(0, 85, TimeSpan.FromMilliseconds(1400)) { EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut } });
 
@@ -28,7 +29,7 @@ namespace EduTrack
             if (EmbeddedDatabase.IsBundled)
             {
                 // The database that ships with the app only runs while the app does, so start it now (the first time it also sets itself up).
-                StatusText.Text = "Starting the database";
+                StatusText.Text = Loc.T("Starting the database");
                 ok = await Task.Run(() => EmbeddedDatabase.EnsureStarted(DatabaseConnectionManager.DatabaseName, out error));
             }
             if (ok) ok = await Task.Run(() => DatabaseConnectionManager.TestConnection(out error));
@@ -36,10 +37,10 @@ namespace EduTrack
 
             if (ok)
             {
-                StatusText.Text = "Getting things ready";
+                StatusText.Text = Loc.T("Getting things ready");
                 await Task.Run(() => SchemaUpgrades.Apply());
                 await DatabaseConnectionManager.WarmUpAsync();
-                StatusText.Text = "Ready";
+                StatusText.Text = Loc.T("Ready");
                 progressBar.BeginAnimation(System.Windows.Controls.Primitives.RangeBase.ValueProperty, new DoubleAnimation(100, TimeSpan.FromMilliseconds(180)));
                 await Task.Delay(220);
                 OpenSignIn();
@@ -48,7 +49,7 @@ namespace EduTrack
             {
                 progressBar.BeginAnimation(System.Windows.Controls.Primitives.RangeBase.ValueProperty, null);
                 progressBar.Value = 0;
-                StatusText.Text = "Can't reach the database";
+                StatusText.Text = Loc.T("Can't reach the database");
                 FailureText.Text = EmbeddedDatabase.IsBundled
                     ? "EduTrack's built-in database could not start. Close EduTrack from the tray icon and open it again; if it keeps failing, reinstall EduTrack (your data is kept).\n" + error
                     : "EduTrack couldn't connect to the database “" + DatabaseConnectionManager.DatabaseName + "” on " + DatabaseConnectionManager.Server +

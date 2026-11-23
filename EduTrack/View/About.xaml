@@ -46,8 +46,7 @@
                         </StackPanel>
                         <WrapPanel Margin="0,22,0,0">
                             <Button Content="GitHub" Click="OpenLink1" Margin="0,0,10,10"/>
-                            <Button Content="LinkedIn" Click="OpenLink2" Margin="0,0,10,10"/>
-                            <Button Content="Support the author" Click="OpenLink3" Margin="0,0,0,10"/>
+                            <Button Content="LinkedIn" Click="OpenLink2" Margin="0,0,0,10"/>
                         </WrapPanel>
                     </StackPanel>
                 </Border>
@@ -64,6 +63,39 @@
                     </StackPanel>
                 </Border>
             </Grid>
-        </StackPanel></Grid>
+
+            <!-- Support -->
+            <Border Style="{StaticResource Card}" Margin="0,16,0,0" Padding="28,24">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Width="56" Height="56" CornerRadius="28" Background="#26FF5E5B" VerticalAlignment="Center">
+                        <Path Style="{StaticResource Icon}" Data="{StaticResource IconHeart}" TextElement.Foreground="#FF5E5B" Stroke="#FF5E5B" Fill="#FF5E5B"
+                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="20,0,20,0" VerticalAlignment="Center">
+                        <TextBlock Text="Support the developer" Style="{StaticResource SectionText}"/>
+                        <TextBlock Style="{StaticResource MutedText}" Margin="0,4,0,0" TextWrapping="Wrap" MaxWidth="620"
+                                   Text="EduTrack is built and kept up to date by one person. If it saves you time, a coffee on Ko-fi helps keep it free and improving."/>
+                    </StackPanel>
+                    <Button Grid.Column="2" Content="Support on Ko-fi" Click="OpenLink3" VerticalAlignment="Center" Padding="22,0" MinHeight="44"
+                            Background="#FF5E5B" Foreground="White" BorderThickness="0" FontWeight="Bold" Cursor="Hand">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="10" Padding="{TemplateBinding Padding}" MinHeight="{TemplateBinding MinHeight}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.Foreground="White"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Bd" Property="Background" Value="#E8504D"/></Trigger>
+                                    <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource FocusBrush}"/><Setter TargetName="Bd" Property="BorderThickness" Value="2"/></Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </Grid>
+            </Border>        </StackPanel></Grid>
     </ScrollViewer>
 </UserControl>

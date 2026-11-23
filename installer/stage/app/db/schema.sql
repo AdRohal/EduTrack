@@ -6,6 +6,68 @@
 /*M!100616 SET @OLD_NOTE_VERBOSITY=@@NOTE_VERBOSITY, NOTE_VERBOSITY=0 */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE IF NOT EXISTS `app_flags` (
+  `FlagName` varchar(60) NOT NULL,
+  PRIMARY KEY (`FlagName`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE IF NOT EXISTS `assessment_scores` (
+  `ScoreID` int(11) NOT NULL AUTO_INCREMENT,
+  `AssessmentID` int(11) NOT NULL,
+  `StudentID` int(11) NOT NULL,
+  `Score` decimal(6,2) DEFAULT NULL,
+  `Flag` varchar(5) DEFAULT NULL,
+  PRIMARY KEY (`ScoreID`),
+  UNIQUE KEY `uq_score` (`AssessmentID`,`StudentID`)
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE IF NOT EXISTS `assessments` (
+  `AssessmentID` int(11) NOT NULL AUTO_INCREMENT,
+  `ModuleID` int(11) NOT NULL,
+  `Title` varchar(100) NOT NULL,
+  `Kind` varchar(20) NOT NULL DEFAULT 'Exam',
+  `Weight` decimal(5,2) NOT NULL DEFAULT 1.00,
+  `MaxScore` decimal(5,2) NOT NULL DEFAULT 20.00,
+  `AssessDate` date DEFAULT NULL,
+  PRIMARY KEY (`AssessmentID`),
+  KEY `ix_assess_module` (`ModuleID`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE IF NOT EXISTS `attendance` (
+  `AttendanceID` int(11) NOT NULL AUTO_INCREMENT,
+  `SessionID` int(11) NOT NULL,
+  `PersonType` char(1) NOT NULL,
+  `PersonID` int(11) NOT NULL,
+  `Status` char(1) NOT NULL,
+  `Note` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`AttendanceID`),
+  UNIQUE KEY `uq_attendance` (`SessionID`,`PersonType`,`PersonID`),
+  KEY `ix_attendance_person` (`PersonType`,`PersonID`)
+) ENGINE=InnoDB AUTO_INCREMENT=188 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE IF NOT EXISTS `class_lessons` (
+  `LessonID` int(11) NOT NULL AUTO_INCREMENT,
+  `ClassID` int(11) NOT NULL,
+  `DayOfWeek` tinyint(4) NOT NULL,
+  `StartTime` time NOT NULL,
+  `EndTime` time NOT NULL,
+  `ModuleID` int(11) DEFAULT NULL,
+  `Title` varchar(100) DEFAULT NULL,
+  `Room` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`LessonID`),
+  KEY `ix_lessons_class` (`ClassID`,`DayOfWeek`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE IF NOT EXISTS `classes` (
   `ClassID` int(11) NOT NULL AUTO_INCREMENT,
   `ClassName` varchar(100) DEFAULT NULL,
@@ -13,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `classes` (
   `Description` text DEFAULT NULL,
   `CreatedDate` date DEFAULT NULL,
   PRIMARY KEY (`ClassID`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -68,6 +130,23 @@ CREATE TABLE IF NOT EXISTS `employee_registry` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE IF NOT EXISTS `lesson_sessions` (
+  `SessionID` int(11) NOT NULL AUTO_INCREMENT,
+  `ClassID` int(11) NOT NULL,
+  `LessonID` int(11) DEFAULT NULL,
+  `SessionDate` date NOT NULL,
+  `StartTime` time NOT NULL,
+  `EndTime` time NOT NULL,
+  `ModuleID` int(11) DEFAULT NULL,
+  `Title` varchar(100) DEFAULT NULL,
+  `TeacherID` int(11) DEFAULT NULL,
+  PRIMARY KEY (`SessionID`),
+  UNIQUE KEY `uq_session` (`ClassID`,`SessionDate`,`StartTime`),
+  KEY `ix_session_date` (`ClassID`,`SessionDate`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE IF NOT EXISTS `login` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `UserName` varchar(18) DEFAULT NULL,
@@ -82,10 +161,12 @@ CREATE TABLE IF NOT EXISTS `modules` (
   `ModuleName` varchar(100) NOT NULL,
   `ClassID` int(11) NOT NULL,
   `CreatedDate` datetime DEFAULT current_timestamp(),
+  `TeacherID` int(11) DEFAULT NULL,
+  `Coefficient` decimal(4,2) NOT NULL DEFAULT 1.00,
   PRIMARY KEY (`ModuleID`),
   KEY `ClassID` (`ClassID`),
   CONSTRAINT `modules_ibfk_1` FOREIGN KEY (`ClassID`) REFERENCES `classes` (`ClassID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -204,4 +285,3 @@ CREATE TABLE IF NOT EXISTS `teacherclasses` (
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
-

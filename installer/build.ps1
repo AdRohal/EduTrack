@@ -1,11 +1,11 @@
-# Builds EduTrack-Setup-<version>.exe
+# Builds "EduTrack Installer V2.exe"
 #   1. compiles EduTrack (Release)
 #   2. stages the app + a trimmed private MariaDB (the app starts it itself and stops it on exit)
 #   3. compiles the installer with Inno Setup (winget install JRSoftware.InnoSetup)
 #
-# Usage:  powershell -ExecutionPolicy Bypass -File installer\build.ps1 [-Version 1.0.0] [-MariaDb "C:\Program Files\MariaDB 13.0"]
+# Usage:  powershell -ExecutionPolicy Bypass -File installer\build.ps1 [-Version 2.0.0] [-MariaDb "C:\Program Files\MariaDB 13.0"]
 param(
-    [string]$Version = "1.0.0",
+    [string]$Version = "2.0.0",
     [string]$MariaDb = "C:\Program Files\MariaDB 13.0"
 )
 $ErrorActionPreference = "Stop"
@@ -41,4 +41,4 @@ Copy-Item "$PSScriptRoot\schema.sql" $db
 Write-Host "Compiling the installer..."
 & $iscc "/DAppVersion=$Version" "/DStageDir=$app" "/O$PSScriptRoot\output" "$PSScriptRoot\EduTrack.iss"
 if ($LASTEXITCODE -ne 0) { throw "Installer compile failed" }
-Write-Host "Done: $PSScriptRoot\output\EduTrack-Setup-$Version.exe"
+Write-Host "Done: $PSScriptRoot\output\EduTrack Installer V2.exe"

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,9 +38,9 @@ namespace EduTrack.View
         private static string Until(DateTime end)
         {
             int days = (int)(end.Date - DateTime.Today).TotalDays;
-            if (days < 0) return "ended " + (-days) + (days == -1 ? " day ago" : " days ago");
-            if (days == 0) return "today";
-            return "in " + days + (days == 1 ? " day" : " days");
+            if (days < 0) return Loc.T("ended " + (-days) + (days == -1 ? " day ago" : " days ago"));
+            if (days == 0) return Loc.T("today");
+            return Loc.T("in " + days + (days == 1 ? " day" : " days"));
         }
 
         private IList<Student> _recent = new List<Student>();
@@ -73,7 +73,7 @@ namespace EduTrack.View
         private static string Greeting(Window host)
         {
             int hour = DateTime.Now.Hour;
-            string part = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+            string part = Loc.T(hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening");
             var user = (host?.DataContext as NavigationVM)?.ConnectedUsername;
             return string.IsNullOrWhiteSpace(user) ? part : part + ", " + user;
         }
@@ -149,7 +149,7 @@ namespace EduTrack.View
                             contracts.Add(new ContractRow
                             {
                                 Name = (reader.Str("f_name") + " " + reader.Str("l_name")).Trim(),
-                                Detail = string.IsNullOrWhiteSpace(role) ? reader.GetString(4) : reader.GetString(4) + " · " + role,
+                                Detail = Loc.T(string.IsNullOrWhiteSpace(role) ? reader.GetString(4) : reader.GetString(4) + " · " + role),
                                 When = Until(end)
                             });
                         }
@@ -165,7 +165,7 @@ namespace EduTrack.View
                         using (var command = new MySqlCommand("SELECT COUNT(*) FROM " + table + " WHERE " + idCols, connection))
                         {
                             int n = Convert.ToInt32(await command.ExecuteScalarAsync());
-                            if (n > 0) gaps.Add(new GapRow { Name = label, Count = n });
+                            if (n > 0) gaps.Add(new GapRow { Name = Loc.T(label), Count = n });
                         }
                     }
                 }
@@ -191,7 +191,7 @@ namespace EduTrack.View
                 ContractsEmpty.Visibility = contracts.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
                 _gaps = gaps;
                 GapsEmpty.Visibility = gaps.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-                SubText.Text = empty ? "Welcome. Let's set up your school." : "Here is what the register holds right now.";
+                SubText.Text = Loc.T(empty ? "Welcome. Let's set up your school." : "Here is what the register holds right now.");
 
                 _recent = recent;
                 RecentEmpty.Visibility = recent.Count == 0 ? Visibility.Visible : Visibility.Collapsed;

@@ -12,7 +12,7 @@
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type vm:ClassVM}">
-        <view:Class/>
+        <view:ClassWorkspace/>
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type vm:TeachersVM}">
@@ -39,14 +39,6 @@
         <view:ShowEmployees/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type vm:NewClassVM}">
-        <view:NewClass/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type vm:ShowClassesVM}">
-        <view:ShowClasses/>
-    </DataTemplate>
-
     <DataTemplate DataType="{x:Type vm:NewTeachersVM}">
         <view:NewTeacher/>
     </DataTemplate>
@@ -65,14 +57,6 @@
 
     <DataTemplate DataType="{x:Type vm:BackupVM}">
         <view:Backup/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type vm:ScheduleClassesVM}">
-        <view:ClassesSchedule/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type vm:GradesVM}">
-        <view:ClassesGrades/>
     </DataTemplate>
 
 </ResourceDictionary>

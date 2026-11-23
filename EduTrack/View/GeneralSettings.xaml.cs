@@ -17,7 +17,14 @@ namespace EduTrack.View
                 case ThemeManager.Slate: SlateTile.IsChecked = true; break;
                 default: ClassicTile.IsChecked = true; break;
             }
+            foreach (ComboBoxItem item in LanguageBox.Items)
+                if ((string)item.Tag == Loc.Language) LanguageBox.SelectedItem = item;
             _ready = true;
+        }
+
+        private void Language_Changed(object sender, SelectionChangedEventArgs e)
+        {
+            if (_ready && LanguageBox.SelectedItem is ComboBoxItem item) Loc.SetLanguage((string)item.Tag);
         }
 
         private void Classic_Checked(object sender, RoutedEventArgs e) { if (_ready) ThemeManager.Apply(ThemeManager.Classic); }
